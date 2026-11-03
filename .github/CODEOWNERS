@@ -1,0 +1,8 @@
+# Toda alteração precisa de revisão do responsável. Com a proteção da branch main ativada
+# (Settings > Branches), este arquivo passa a exigir a revisão antes do merge.
+*                       @LupinNoctisz
+/src/nexus/core/        @LupinNoctisz
+/src/nexus/api/         @LupinNoctisz
+/.github/               @LupinNoctisz
+/scripts/               @LupinNoctisz
+/docs/SECURITY.md       @LupinNoctisz

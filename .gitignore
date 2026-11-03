@@ -1,18 +1,57 @@
+# --- Python ---
 .venv/
+venv/
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 build/
 dist/
-# dados locais e segredos nunca vão para o repositório
+
+# --- cobertura de testes ---
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# --- .NET / Visual Studio ---
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+publish/
+
+# --- dados locais do NEXUS (nunca versionar) ---
 *.db
 *.db-wal
 *.db-shm
+*.sqlite
+*.sqlite3
 *.sha256
-.env
-*.pem
-*.key
 logs/
 backups/
 reports/
+module_data/
+
+# --- segredos e credenciais (nunca versionar) ---
+.env
+.env.*
+!.env.example
+secrets.*
+credentials*.json
+service-account*.json
+token*.txt
+id_rsa*
+id_ed25519*
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+*.keystore
+# chaves de licenciamento e de assinatura de módulos
+keys/
+licenses/private/
+signing/

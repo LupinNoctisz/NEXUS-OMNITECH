@@ -1,0 +1,4 @@
+#!/bin/sh
+# Bloqueia commits com segredos ou dados pessoais. Ative com:  git config core.hooksPath .githooks
+if command -v python3 >/dev/null 2>&1; then PY=python3; else PY=python; fi
+exec "$PY" scripts/scan_secrets.py --staged
