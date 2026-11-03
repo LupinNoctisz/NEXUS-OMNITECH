@@ -1,0 +1,11 @@
+{
+  "id": "nexus.pc_diagnostics",
+  "name": "NEXUS PC Diagnostics",
+  "version": "0.0.0",
+  "publisher": "LMF Informática",
+  "status": "planned",
+  "min_core": "0.1.0",
+  "permissions": [],
+  "description": "Diagnóstico de computadores e notebooks (etapa 3)",
+  "files": {}
+}

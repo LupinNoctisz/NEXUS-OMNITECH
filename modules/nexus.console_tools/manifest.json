@@ -1,0 +1,11 @@
+{
+  "id": "nexus.console_tools",
+  "name": "NEXUS Console Tools",
+  "version": "0.0.0",
+  "publisher": "LMF Informática",
+  "status": "planned",
+  "min_core": "0.1.0",
+  "permissions": [],
+  "description": "Ferramentas para PlayStation, Xbox e Nintendo conforme permissões oficiais (etapa 5)",
+  "files": {}
+}

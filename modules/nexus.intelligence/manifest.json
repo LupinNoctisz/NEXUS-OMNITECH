@@ -1,0 +1,11 @@
+{
+  "id": "nexus.intelligence",
+  "name": "NEXUS Intelligence",
+  "version": "0.0.0",
+  "publisher": "LMF Informática",
+  "status": "planned",
+  "min_core": "0.1.0",
+  "permissions": [],
+  "description": "Motor de interpretação de diagnósticos e relatórios (etapa 7)",
+  "files": {}
+}
