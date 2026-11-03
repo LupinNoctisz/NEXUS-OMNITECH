@@ -3,7 +3,7 @@
 
 Plataforma profissional de diagnóstico, manutenção e reparação tecnológica para técnicos e assistências técnicas.
 
-> **Estado atual: Etapa 1 concluída (arquitetura e núcleo).** Existe o NEXUS CORE funcional e testado.
+> **Estado atual: Etapa 1 concluída (núcleo) + Fase 0 de segurança (autenticação, scanner de segredos, API local) em andamento.** Existe o NEXUS CORE funcional e testado.
 > Os módulos de diagnóstico (PC, Mobile, Console, Electronics Lab, Intelligence) estão **planejados** e
 > aparecem como `planned` — nenhum deles gera resultados ainda. Não há interface gráfica nesta etapa.
 
@@ -14,7 +14,7 @@ Plataforma profissional de diagnóstico, manutenção e reparação tecnológica
 | Banco local SQLite com migrações versionadas | ✅ |
 | Logs estruturados (JSON Lines), rotação e redação de credenciais | ✅ |
 | Histórico de operações com hash encadeado (detecta adulteração) | ✅ |
-| Papéis e permissões (viewer / technician / admin) | ✅ (identidade declarativa; ver SECURITY) |
+| Autenticação por senha (scrypt, bloqueio por tentativas) e papéis viewer / technician / admin | ✅ |
 | Configurações com validação | ✅ |
 | Dispositivos: host local e USB (Linux sysfs / Windows PnP) + cadastro manual | ✅ (USB Windows não testado em Windows) |
 | Sessões de diagnóstico | ✅ |
@@ -32,8 +32,8 @@ Plataforma profissional de diagnóstico, manutenção e reparação tecnológica
 ## Uso rápido
 ```bash
 python -m venv .venv && .venv/bin/pip install -e .[dev]   # Windows: .venv\Scripts\...
-nexus init --admin "SEU NOME"
-nexus --as "SEU NOME" status
+nexus init --admin "SEU NOME"            # pede a senha do administrador (mín. 10 caracteres)
+nexus --as "SEU NOME" status             # pede a senha; sem --as o acesso é anônimo (somente leitura)
 nexus --as "SEU NOME" devices scan
 nexus --as "SEU NOME" modules list
 pytest

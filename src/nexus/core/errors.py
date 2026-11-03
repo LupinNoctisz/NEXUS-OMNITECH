@@ -13,6 +13,10 @@ class PermissionDenied(NexusError):
     """O técnico atual não possui a permissão necessária."""
 
 
+class AuthenticationError(NexusError):
+    """Credenciais inválidas, conta inativa/bloqueada ou sessão não autenticada."""
+
+
 class ConfirmationRequired(NexusError):
     """Operação sensível exige confirmação/autorização explícita."""
 

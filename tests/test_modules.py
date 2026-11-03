@@ -104,10 +104,9 @@ def test_module_actions_are_audited_with_module_prefix(core, make_module):
     assert core.audit.recent(1)[0]["action"] == "nexus.demo:teste"
 
 
-def test_technician_cannot_manage_modules(core, make_module):
+def test_technician_cannot_manage_modules(core, make_module, login_as):
     make_module()
-    core.add_technician("tec", "technician")
-    core.actor = "tec"
+    login_as("tec", "technician")
     with pytest.raises(PermissionDenied):
         core.modules.register("nexus.demo", confirmed=True)
 
@@ -121,3 +120,32 @@ def test_bundled_planned_modules_are_listed():
         "nexus.pc_diagnostics", "nexus.mobile_tools", "nexus.console_tools",
         "nexus.electronics_lab", "nexus.intelligence"}
     assert all(m.status == "planned" for m in manifests)
+
+
+def test_module_context_is_a_restricted_facade(core, make_module):
+    make_module()
+    core.modules.register("nexus.demo", confirmed=True)
+    core.modules.enable("nexus.demo")
+    core.modules.load_enabled()
+    ctx = core.modules.loaded["nexus.demo"].ctx
+    # sem caminho direto ao núcleo, aos repositórios ou à trava de segurança
+    assert not hasattr(ctx.devices, "_core") and not hasattr(ctx.sessions, "_core")
+    assert not hasattr(ctx.devices.list, "__self__")
+    assert not hasattr(ctx, "core") and not hasattr(ctx, "safety") and not hasattr(ctx, "db")
+    # e continua útil: consulta e sessões passam pelas permissões do técnico autenticado
+    device_id = core.devices.add_manual("pc", model="Notebook X")
+    assert ctx.devices.get(device_id)["model"] == "Notebook X"
+    sid = ctx.sessions.start(device_id, "general")
+    ctx.sessions.finish(sid, summary="ok")
+    assert ctx.sessions.get(sid)["status"] == "completed"
+
+
+def test_module_facade_respects_permissions(core, make_module, login_as):
+    make_module()
+    core.modules.register("nexus.demo", confirmed=True)
+    core.modules.enable("nexus.demo")
+    core.modules.load_enabled()
+    ctx = core.modules.loaded["nexus.demo"].ctx
+    login_as("leitor", "viewer")
+    with pytest.raises(PermissionDenied):
+        ctx.sessions.start(1)

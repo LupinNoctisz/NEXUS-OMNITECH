@@ -2,6 +2,7 @@
 
 from .app import NexusCore
 from .errors import (
+    AuthenticationError,
     BackupError,
     ConfirmationRequired,
     IntegrityError,
@@ -15,6 +16,7 @@ __all__ = [
     "NexusCore",
     "NexusError",
     "PermissionDenied",
+    "AuthenticationError",
     "ConfirmationRequired",
     "IntegrityError",
     "ModuleError",

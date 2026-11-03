@@ -15,6 +15,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import re
+import types
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -289,14 +290,29 @@ class ModuleRegistry:
                 raise ModuleError(f"Classe {class_name} deve implementar {attr}()")
         data_dir = self._core.paths.module_data / module_id
         data_dir.mkdir(parents=True, exist_ok=True)
+        core = self._core
+        # Fachadas mínimas: o módulo NÃO recebe o núcleo, os repositórios nem a trava de segurança.
+        # (Não é um sandbox: código do módulo roda no mesmo processo e só é carregado se íntegro e
+        # registrado por um administrador. Isolamento real por processo está previsto para a etapa 9.)
+        devices = types.SimpleNamespace(
+            list=lambda connection=None: core.devices.list(connection),
+            get=lambda device_id: core.devices.get(device_id),
+        )
+        sessions = types.SimpleNamespace(
+            start=lambda device_id, kind="general": core.sessions.start(device_id, kind),
+            finish=lambda session_id, status="completed", summary=None: core.sessions.finish(
+                session_id, status=status, summary=summary),
+            get=lambda session_id: core.sessions.get(session_id),
+            recent=lambda limit=10: core.sessions.recent(limit),
+        )
         ctx = ModuleContext(
             module_id=module_id,
-            logger=self._core.log.getChild(module_id),
+            logger=core.log.getChild(module_id),
             data_dir=data_dir,
-            devices=self._core.devices,
-            sessions=self._core.sessions,
-            audit_record=lambda action, **kw: self._core.audit.record(
-                f"{module_id}:{action}", technician=self._core.actor, **kw),
+            devices=devices,
+            sessions=sessions,
+            audit_record=lambda action, **kw: core.audit.record(
+                f"{module_id}:{action}", technician=core.actor, **kw),
         )
         instance.initialize(ctx)
         self.loaded[module_id] = instance

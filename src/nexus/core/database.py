@@ -72,6 +72,14 @@ MIGRATIONS: list[tuple[int, str]] = [
         CREATE INDEX idx_operations_session ON operations(session_id);
         """,
     ),
+    (
+        2,
+        """
+        ALTER TABLE technicians ADD COLUMN password_hash TEXT;
+        ALTER TABLE technicians ADD COLUMN failed_attempts INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE technicians ADD COLUMN locked_until TEXT;
+        """,
+    ),
 ]
 
 SCHEMA_VERSION = MIGRATIONS[-1][0]

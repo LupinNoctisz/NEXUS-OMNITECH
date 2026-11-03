@@ -2,22 +2,24 @@ import sqlite3
 
 import pytest
 
-from nexus.core import (BackupError, ConfirmationRequired, NexusCore, NexusError,
+from nexus.core import (AuthenticationError, BackupError, ConfirmationRequired, NexusCore, NexusError,
                         PermissionDenied, ValidationError)
 from nexus.core.devices import DeviceInfo, UsbProvider
 from nexus.core.permissions import Role
+
+from conftest import PASSWORD
 from nexus.core.safety import DestructiveRequest
 
 
 # --- banco / auditoria ------------------------------------------------------
 def test_schema_migrated(core):
-    assert core.db.schema_version == 1
+    assert core.db.schema_version == 2  # v2 = autenticação por senha
     assert core.db.integrity_check()
 
 
 def test_audit_chain_detects_tampering(core):
-    core.add_technician("ana", "technician")
-    core.add_technician("bia", "viewer")
+    core.add_technician("ana", "technician", PASSWORD)
+    core.add_technician("bia", "viewer", PASSWORD)
     assert core.audit.verify().ok
     core.db.execute("UPDATE operations SET target = 'forjado' WHERE id = 2")
     result = core.audit.verify()
@@ -38,23 +40,22 @@ def test_anonymous_is_read_only(tmp_path):
         assert anon.audit.recent(1)[0]["action"] == "permission.denied"
 
 
-def test_viewer_cannot_start_session(core):
-    core.add_technician("leitor", Role.VIEWER)
-    core.actor = "leitor"
+def test_viewer_cannot_start_session(core, login_as):
+    login_as("leitor", Role.VIEWER)
     with pytest.raises(PermissionDenied):
         core.sessions.start(1)
 
 
 def test_bootstrap_only_once(core):
     with pytest.raises(NexusError):
-        core.bootstrap_admin("outro")
+        core.bootstrap_admin("outro", PASSWORD)
 
 
-def test_inactive_technician_loses_access(core):
-    core.add_technician("tec", "technician")
-    core.technicians.set_active("tec", False)
-    core.actor = "tec"
-    assert core.role == Role.VIEWER
+def test_inactive_technician_cannot_login(core):
+    core.add_technician("tec", "technician", PASSWORD)
+    core.set_technician_active("tec", False)
+    with pytest.raises(AuthenticationError):
+        core.login("tec", PASSWORD)
 
 
 # --- configurações ----------------------------------------------------------
@@ -183,10 +184,10 @@ def test_destructive_success_and_failure_are_logged(core):
 
 # --- backup -----------------------------------------------------------------
 def test_backup_create_verify_restore(core):
-    core.add_technician("ana")
+    core.add_technician("ana", "technician", PASSWORD)
     path = core.backups.create("teste")
     core.backups.verify(path)
-    core.add_technician("bia")
+    core.add_technician("bia", "technician", PASSWORD)
     assert core.technicians.count() == 3
     with pytest.raises(ConfirmationRequired):
         core.backups.restore(path)

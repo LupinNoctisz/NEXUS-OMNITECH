@@ -67,6 +67,27 @@ class BackupManager:
             return []
         return sorted((p for p in self.folder.glob("nexus-*.db") if _NAME.match(p.name)), reverse=True)
 
+    def path_for(self, name: str) -> Path:
+        """Resolve um backup pelo NOME (como listado). Rejeita qualquer caminho."""
+        if not isinstance(name, str) or not _NAME.match(name):
+            raise BackupError("Nome de backup inválido.")
+        path = self.folder / name
+        if not path.is_file():
+            raise BackupError(f"Backup não encontrado: {name}")
+        return path
+
+    def describe(self) -> list[dict]:
+        result = []
+        for path in self.list():
+            stat = path.stat()
+            result.append({
+                "name": path.name,
+                "size_bytes": stat.st_size,
+                "modified_utc": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(timespec="seconds"),
+                "has_checksum": Path(str(path) + ".sha256").exists(),
+            })
+        return result
+
     def verify(self, path: Path) -> None:
         """Levanta BackupError se o arquivo estiver corrompido ou divergir do checksum."""
         path = Path(path)
@@ -87,9 +108,12 @@ class BackupManager:
         path = Path(path)
         self.verify(path)
         safety_copy = self.create("pre-restore")
+        who = self._core.actor
         self._core.db.restore_from(path)
-        self._core.audit.record("backup.restore", technician=self._core.actor, target=path.name,
+        self._core.audit.record("backup.restore", technician=who, target=path.name,
                                 details={"pre_restore_backup": safety_copy.name})
+        # o backup pode não conter (ou conter inativo) o técnico que restaurou
+        self._core.revalidate_actor()
         return safety_copy
 
     def _prune(self) -> None:
