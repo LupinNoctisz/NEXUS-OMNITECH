@@ -22,6 +22,7 @@ Plataforma profissional de diagnóstico, manutenção e reparação tecnológica
 | Trava de operações destrutivas (confirmação + autorização + backup + auditoria) | ✅ |
 | Backups com checksum e restauração segura | ✅ |
 | Painel inicial (`nexus status`) com alertas reais | ✅ |
+| API local para a interface (JSON-RPC por stdio, lista fechada de métodos) | ✅ |
 | Atualizador, gerenciador de drivers | ⏳ etapas seguintes |
 | Sincronização, licenciamento | ⏳ etapa 8 |
 
@@ -42,6 +43,7 @@ Os dados ficam em `%LOCALAPPDATA%\NexusOmnitech` (Windows) ou `~/.local/share/ne
 
 ## Documentação
 - [Arquitetura](docs/ARCHITECTURE.md)
+- [Protocolo UI ↔ núcleo](docs/PROTOCOL.md)
 - [Segurança e limitações conhecidas](docs/SECURITY.md)
 - [Roadmap por etapas](docs/ROADMAP.md)
 
