@@ -3,7 +3,7 @@
 
 Plataforma profissional de diagnóstico, manutenção e reparação tecnológica para técnicos e assistências técnicas.
 
-> **Estado atual: Etapa 1 (núcleo) e Fase 0 (segurança) concluídas; Etapa 2 (interface WPF) compilada e testada no CI do Windows; aparência ainda não revisada por um humano.**
+> **Estado atual: Etapa 1 (núcleo) e Fase 0 (segurança) concluídas; Etapa 2 (interface WPF + instalador) compilada, testada e instalada no CI do Windows; aparência ainda não revisada por um humano.**
 > A interface (`ui/`) compila e passa 64 testes automáticos (incluindo ponta a ponta com o núcleo real), mas **ninguém abriu a janela ainda**:
 > layout, cores e usabilidade precisam do seu teste no Windows. Veja [ui/README.md](ui/README.md).
 > Os módulos de diagnóstico (PC, Mobile, Console, Electronics Lab, Intelligence) estão **planejados** e
@@ -25,7 +25,7 @@ Plataforma profissional de diagnóstico, manutenção e reparação tecnológica
 | Backups com checksum e restauração segura | ✅ |
 | Painel inicial (`nexus status`) com alertas reais | ✅ |
 | API local para a interface (JSON-RPC por stdio, lista fechada de métodos) | ✅ |
-| Interface WPF (login, 8 seções, tema escuro/claro) com dados reais do núcleo | 🟡 compila e testa no CI; falta revisão visual |
+| Interface WPF (login, 8 seções, tema escuro/claro) com dados reais do núcleo | 🟡 compila, testa e instala/abre/atualiza/desinstala no CI; falta revisão visual na sua máquina |
 | Atualizador, gerenciador de drivers | ⏳ etapas seguintes |
 | Sincronização, licenciamento | ⏳ etapa 8 |
 
@@ -46,6 +46,7 @@ Os dados ficam em `%LOCALAPPDATA%\NexusOmnitech` (Windows) ou `~/.local/share/ne
 
 ## Documentação
 - [Arquitetura](docs/ARCHITECTURE.md)
+- [Instalação, atualização e desinstalação](docs/INSTALACAO.md)
 - [Interface WPF](ui/README.md)
 - [Protocolo UI ↔ núcleo](docs/PROTOCOL.md)
 - [Segurança e limitações conhecidas](docs/SECURITY.md)

@@ -16,7 +16,9 @@ sem porta de rede, e não executa comandos do sistema.
 | `Nexus.App` | WPF: janela, login, 8 telas (Início, Dispositivos, Diagnósticos, Histórico, Módulos, Backups, Segurança, Configurações), temas escuro/claro |
 | `Nexus.Tests` | xunit: contrato com respostas reais do núcleo (`Fixtures/`), JSON-RPC, ViewModels e um teste **ponta a ponta com o núcleo real** |
 
-## Executar no Windows
+> Para **instalar como um programa normal** (atalhos, menu Iniciar, desinstalador), veja [docs/INSTALACAO.md](../docs/INSTALACAO.md).
+
+## Executar a partir do código (desenvolvimento)
 Requisitos: .NET 8 SDK e Python 3.12 (o núcleo usa só a biblioteca padrão).
 ```powershell
 dotnet build ui/Nexus.sln

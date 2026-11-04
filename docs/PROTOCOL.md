@@ -38,6 +38,9 @@ A interface (WPF) inicia o núcleo como **processo filho**: `python -m nexus --h
 |---|---|---|---|
 | `rpc.hello` | não | – | `protocol`, `core_version`, `schema_version`, `methods`, `actor`, `role`, `permissions`, `authenticated` |
 | `rpc.shutdown` | não | – | `{ok}` |
+| `setup.status` | não | – | `{initialized}` (false = primeiro uso, ainda não há técnicos) |
+| `setup.create_admin` | não | `name`, `password` | `actor`, `role`, `permissions` — cria o PRIMEIRO administrador e entra; o núcleo recusa se já existir qualquer técnico |
+| `system.paths` | sim | – | `home`, `database`, `logs`, `backups`, `modules` |
 | `auth.login` | não | `name`, `password` | `actor`, `role`, `permissions` |
 | `auth.logout` / `auth.whoami` | não | – | |
 | `auth.change_password` | sim | `old_password`, `new_password` | `{changed}` |
