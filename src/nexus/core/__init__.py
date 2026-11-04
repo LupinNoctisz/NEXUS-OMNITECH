@@ -9,12 +9,14 @@ from .errors import (
     ModuleError,
     NexusError,
     PermissionDenied,
+    SchemaVersionError,
     ValidationError,
 )
 
 __all__ = [
     "NexusCore",
     "NexusError",
+    "SchemaVersionError",
     "PermissionDenied",
     "AuthenticationError",
     "ConfirmationRequired",

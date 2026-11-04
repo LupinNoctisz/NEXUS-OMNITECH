@@ -1,0 +1,29 @@
+<UserControl x:Class="Nexus.App.Views.SetupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="{DynamicResource BgBrush}">
+        <Border Style="{StaticResource Card}" Width="440" Padding="28" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="Bem-vindo ao NEXUS OMNITECH" FontSize="22" FontWeight="Bold"/>
+                <TextBlock Text="Primeiro uso: crie o administrador do sistema." Style="{StaticResource Muted}" Margin="0,8,0,20"/>
+
+                <TextBlock Text="Nome do administrador" Style="{StaticResource Muted}"/>
+                <TextBox x:Name="NameBox" Margin="0,4,0,12" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Senha (mínimo de 10 caracteres, não só números)" Style="{StaticResource Muted}"/>
+                <PasswordBox x:Name="PasswordBox" Margin="0,4,0,12"/>
+
+                <TextBlock Text="Confirmar senha" Style="{StaticResource Muted}"/>
+                <PasswordBox x:Name="ConfirmBox" Margin="0,4,0,12" KeyDown="ConfirmBox_KeyDown"/>
+
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource CritBrush}" TextWrapping="Wrap"
+                           Margin="0,0,0,10" Visibility="{Binding ErrorMessage, Converter={StaticResource TextVisible}}"/>
+
+                <Button Content="Criar administrador e entrar" Style="{StaticResource PrimaryButton}" Margin="0"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}" Click="Create_Click"/>
+                <TextBlock Style="{StaticResource Muted}" Margin="0,16,0,0" FontSize="11"
+                           Text="Não existe recuperação de senha por e-mail: guarde-a com segurança. Os dados ficam somente neste computador."/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

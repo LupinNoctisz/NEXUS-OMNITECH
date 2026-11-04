@@ -23,6 +23,8 @@ public sealed class FakeCoreApi : ICoreApi
     public Dictionary<string, JsonElement> Settings = Fixture.Result<Dictionary<string, JsonElement>>("settings_all");
     public List<TechnicianDto> Technicians = Fixture.Result<List<TechnicianDto>>("technicians_list");
     public HelloInfo HelloValue = Fixture.Result<HelloInfo>("hello");
+    public SetupStatus SetupStatusValue = Fixture.Result<SetupStatus>("setup_status");
+    public SystemPaths PathsValue = Fixture.Result<SystemPaths>("system_paths");
     public WhoAmI LoginResult = Fixture.Result<WhoAmI>("login");
 
     /// <summary>Quando definida, TODA chamada lança esta exceção.</summary>
@@ -46,6 +48,24 @@ public sealed class FakeCoreApi : ICoreApi
     }
 
     public Task<HelloInfo> HelloAsync(CancellationToken ct = default) { Record("hello"); return Task.FromResult(HelloValue); }
+
+    public Task<SetupStatus> GetSetupStatusAsync(CancellationToken ct = default)
+    {
+        Record("setup.status");
+        return Task.FromResult(SetupStatusValue);
+    }
+
+    public Task<WhoAmI> CreateAdminAsync(string name, string password, CancellationToken ct = default)
+    {
+        Record("setup.create_admin", name);
+        return Task.FromResult(LoginResult);
+    }
+
+    public Task<SystemPaths> GetSystemPathsAsync(CancellationToken ct = default)
+    {
+        Record("system.paths");
+        return Task.FromResult(PathsValue);
+    }
 
     public Task<WhoAmI> LoginAsync(string name, string password, CancellationToken ct = default)
     {
@@ -209,6 +229,22 @@ public sealed class FakeDialogs : IDialogService
     }
 
     public void ShowInfo(string title, string message) { }
+}
+
+public sealed class FakeRuntime : IRuntimeInfo
+{
+    public string AppVersion => "0.1.0";
+    public string PythonPath => @"C:\Python312\python.exe";
+    public string PythonVersion => "3.12.10";
+    public string CorePath => @"C:\NEXUS\core";
+    public string? ChooseResult = "Python alterado.";
+    public int ChooseCalls;
+
+    public Task<string?> ChoosePythonAsync()
+    {
+        ChooseCalls++;
+        return Task.FromResult(ChooseResult);
+    }
 }
 
 public sealed class FakeTheme : IThemeService

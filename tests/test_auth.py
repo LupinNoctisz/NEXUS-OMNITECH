@@ -241,3 +241,39 @@ def test_security_overview_reflects_real_state(core):
     assert overview["actor"] == "admin" and overview["role"] == "admin"
     assert Permission.MODULES_MANAGE in overview["permissions"]
     assert overview["audit"]["ok"] and overview["database_integrity"]
+
+
+# --- atualização do banco: backup antes de migrar e proteção contra downgrade ----------------
+def test_migration_makes_verified_backup_of_existing_database_first(tmp_path):
+    home = tmp_path / "h"
+    home.mkdir()
+    make_v1_database(home / "nexus.db")
+    with NexusCore(home=home, module_dirs=[tmp_path / "m"]) as core:
+        backups = [p for p in core.paths.backups.glob("nexus-*-pre-migration-v1*.db")]
+        assert len(backups) == 1
+        assert (core.paths.backups / (backups[0].name + ".sha256")).exists()
+        core.backups.verify(backups[0])  # checksum + integridade conferem
+        old = sqlite3.connect(backups[0])
+        assert old.execute("PRAGMA user_version").fetchone()[0] == 1  # cópia do estado ANTES
+        old.close()
+
+
+def test_fresh_database_makes_no_migration_backup(tmp_path):
+    with NexusCore(home=tmp_path / "h", module_dirs=[tmp_path / "m"]) as core:
+        assert list(core.paths.backups.glob("*pre-migration*")) == []
+
+
+def test_newer_database_is_refused_and_left_untouched(tmp_path):
+    from nexus.core import SchemaVersionError
+
+    home = tmp_path / "h"
+    with NexusCore(home=home, module_dirs=[tmp_path / "m"]):
+        pass
+    conn = sqlite3.connect(home / "nexus.db")
+    conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION + 5}")
+    conn.close()
+    before = (home / "nexus.db").read_bytes()
+    with pytest.raises(SchemaVersionError):
+        NexusCore(home=home, module_dirs=[tmp_path / "m"])
+    assert sqlite3.connect(home / "nexus.db").execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION + 5
+    assert not list((home / "backups").glob("*pre-migration*"))

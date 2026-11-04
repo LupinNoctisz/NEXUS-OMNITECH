@@ -1,13 +1,13 @@
 {
   "jsonrpc": "2.0",
-  "id": 16,
+  "id": 19,
   "result": [
     {
       "id": 2,
       "name": "leitor.demo",
       "role": "viewer",
       "active": true,
-      "created_at": "2026-11-04T01:25:33+00:00",
+      "created_at": "2026-11-04T12:18:25+00:00",
       "failed_attempts": 0,
       "locked_until": null,
       "has_password": true
@@ -17,7 +17,7 @@
       "name": "tecnico.demo",
       "role": "admin",
       "active": true,
-      "created_at": "2026-11-04T01:25:33+00:00",
+      "created_at": "2026-11-04T12:18:25+00:00",
       "failed_attempts": 0,
       "locked_until": null,
       "has_password": true

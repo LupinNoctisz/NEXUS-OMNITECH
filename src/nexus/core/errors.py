@@ -29,5 +29,9 @@ class ModuleError(NexusError):
     """Erro de gerenciamento ou carregamento de módulo."""
 
 
+class SchemaVersionError(NexusError):
+    """O banco foi criado por uma versão mais nova do NEXUS (não há downgrade automático)."""
+
+
 class BackupError(NexusError):
     """Falha ao criar ou restaurar um backup."""

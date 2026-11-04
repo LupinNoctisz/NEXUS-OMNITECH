@@ -75,10 +75,13 @@ def main() -> None:
             saved[fixture] = json.loads(server.handle(json.dumps(request).encode()))
 
         call("hello", "rpc.hello")
+        call("setup_status", "setup.status")
+        call("error_already_initialized", "setup.create_admin", name="intruso", password=PASSWORD)
         call("error_not_authenticated", "status.get")
         call("login", "auth.login", name="tecnico.demo", password=PASSWORD)
         call("status", "status.get")
         call("security_overview", "security.overview")
+        call("system_paths", "system.paths")
         call("devices_list", "devices.list")
         call("scan_result", "devices.scan")
         call("sessions_recent", "sessions.recent", limit=10)

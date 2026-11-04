@@ -5,8 +5,12 @@ from __future__ import annotations
 import sqlite3
 import threading
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Sequence
+
+from .errors import BackupError, SchemaVersionError
+from .util import sha256_file
 
 MIGRATIONS: list[tuple[int, str]] = [
     (
@@ -103,6 +107,12 @@ class Database:
     def _migrate(self) -> None:
         with self._lock:
             current = self._conn.execute("PRAGMA user_version").fetchone()[0]
+            if current > SCHEMA_VERSION:
+                raise SchemaVersionError(
+                    f"Este banco de dados é da versão {current} do esquema, mais nova que a suportada por este NEXUS "
+                    f"({SCHEMA_VERSION}). Atualize o NEXUS; o banco não foi alterado.")
+            if 0 < current < SCHEMA_VERSION and self.path != ":memory:":
+                self._backup_before_migration(current)
             for version, sql in MIGRATIONS:
                 if version <= current:
                     continue
@@ -112,6 +122,35 @@ class Database:
                     if self._conn.in_transaction:
                         self._conn.execute("ROLLBACK")
                     raise
+
+    def _backup_before_migration(self, current: int) -> None:
+        """Cópia de segurança (verificada) do banco existente ANTES de migrá-lo para um esquema novo."""
+        folder = Path(self.path).parent / "backups"
+        folder.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        target = folder / f"nexus-{stamp}-pre-migration-v{current}.db"
+        counter = 1
+        while target.exists():
+            target = folder / f"nexus-{stamp}-pre-migration-v{current}-{counter}.db"
+            counter += 1
+        try:
+            copy = sqlite3.connect(str(target))
+            try:
+                self._conn.backup(copy)
+            finally:
+                copy.close()
+            check = sqlite3.connect(f"file:{target}?mode=ro", uri=True)
+            try:
+                if check.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                    raise sqlite3.DatabaseError("a cópia não passou na verificação de integridade")
+            finally:
+                check.close()
+            digest = sha256_file(target)
+            Path(str(target) + ".sha256").write_text(f"{digest}  {target.name}\n", encoding="utf-8")
+        except Exception as exc:
+            target.unlink(missing_ok=True)
+            raise BackupError(
+                f"Não foi possível fazer o backup de segurança antes de atualizar o banco; nada foi alterado. ({exc})") from exc
 
     @property
     def schema_version(self) -> int:

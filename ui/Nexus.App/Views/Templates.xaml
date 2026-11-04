@@ -408,9 +408,15 @@
                 <Border Style="{StaticResource Card}" Margin="0,12,0,0">
                     <StackPanel>
                         <TextBlock Text="SOMENTE LEITURA" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{Binding AppText}" Margin="0,0,0,4"/>
                         <TextBlock Text="{Binding CoreText}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding PythonText, Mode=OneWay}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding DataText, StringFormat='Dados: {0}'}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding BackupsPathText, StringFormat='Backups: {0}'}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding LogsPathText, StringFormat='Logs: {0}'}" TextWrapping="Wrap" Margin="0,0,0,4"/>
                         <TextBlock Text="{Binding ModeText, StringFormat='Modo: {0}'}" Margin="0,0,0,4"/>
                         <TextBlock Text="{Binding PublishersText, StringFormat='Publicadores de módulos confiáveis: {0}'}" TextWrapping="Wrap"/>
+                        <Button Content="Escolher outro Python…" Command="{Binding ChoosePythonCommand}" Margin="0,8,0,0" HorizontalAlignment="Left"/>
                         <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,8,0,0"
                                    Text="Sincronização online e licenciamento ainda não foram implementados (etapa 8 do roteiro)."/>
                     </StackPanel>

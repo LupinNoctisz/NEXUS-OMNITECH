@@ -11,7 +11,8 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly IThemeService _theme;
     private readonly Dictionary<string, PageViewModel> _pages = new();
 
-    public ShellViewModel(ICoreApi api, ISessionContext session, IDialogService dialogs, IThemeService theme)
+    public ShellViewModel(ICoreApi api, ISessionContext session, IDialogService dialogs, IThemeService theme,
+        IRuntimeInfo runtime)
     {
         _api = api;
         _session = session;
@@ -25,7 +26,7 @@ public sealed partial class ShellViewModel : ObservableObject
             new("modules", "Módulos", "", () => new ModulesViewModel(api, session, dialogs)),
             new("backups", "Backups", "", () => new BackupsViewModel(api, session, dialogs)),
             new("security", "Segurança", "", () => new SecurityViewModel(api, session, dialogs)),
-            new("settings", "Configurações", "", () => new SettingsViewModel(api, session, dialogs, theme)),
+            new("settings", "Configurações", "", () => new SettingsViewModel(api, session, dialogs, theme, runtime)),
         };
     }
 

@@ -2,10 +2,11 @@ name: Interface (.NET/WPF)
 
 on:
   push:
-    branches: [main]
-    paths: ["ui/**", "src/**", "scripts/dump_rpc_fixtures.py", ".github/workflows/dotnet.yml"]
+    branches: [main, "feat/**"]
+    paths: ["ui/**", "src/**", "modules/**", "installer/**", "scripts/dump_rpc_fixtures.py", ".github/workflows/dotnet.yml"]
   pull_request:
-    paths: ["ui/**", "src/**", "scripts/dump_rpc_fixtures.py", ".github/workflows/dotnet.yml"]
+    paths: ["ui/**", "src/**", "modules/**", "installer/**", "scripts/dump_rpc_fixtures.py", ".github/workflows/dotnet.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -41,3 +42,41 @@ jobs:
         with:
           name: resultados-testes-dotnet
           path: "**/resultado.trx"
+
+  installer:
+    name: Instalador (gerar + instalar/abrir/atualizar/desinstalar)
+    runs-on: windows-latest
+    needs: build-test
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --no-progress -y
+          }
+      - name: Gerar o instalador
+        shell: pwsh
+        run: ./installer/build.ps1 -Version 0.1.0
+      - name: Testar o instalador (instalar, abrir, atualizar, desinstalar)
+        shell: pwsh
+        run: ./installer/test-installer.ps1 -Version 0.1.0 -NewVersion 0.1.1
+      - name: Publicar instalador como artefato do CI (não é uma release)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusOmnitech-Setup-0.1.0
+          path: |
+            build/installer/NexusOmnitech-Setup-0.1.0.exe
+            build/installer/NexusOmnitech-Setup-0.1.0.exe.sha256
+          if-no-files-found: error

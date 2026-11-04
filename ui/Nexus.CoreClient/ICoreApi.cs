@@ -9,6 +9,10 @@ public interface ICoreApi
     event EventHandler? Disconnected;
 
     Task<HelloInfo> HelloAsync(CancellationToken ct = default);
+    Task<SetupStatus> GetSetupStatusAsync(CancellationToken ct = default);
+    /// <summary>Cria o PRIMEIRO administrador (o núcleo recusa se já existir algum técnico) e entra com ele.</summary>
+    Task<WhoAmI> CreateAdminAsync(string name, string password, CancellationToken ct = default);
+    Task<SystemPaths> GetSystemPathsAsync(CancellationToken ct = default);
     Task<WhoAmI> LoginAsync(string name, string password, CancellationToken ct = default);
     Task LogoutAsync(CancellationToken ct = default);
     Task ChangePasswordAsync(string oldPassword, string newPassword, CancellationToken ct = default);

@@ -457,7 +457,7 @@ public class SecuritySettingsLoginShellTests
     public async Task Settings_reject_invalid_values_without_calling_the_core()
     {
         var api = new FakeCoreApi();
-        var vm = new SettingsViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme());
+        var vm = new SettingsViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         await vm.LoadAsync();
 
         vm.BackupKeepText = "0";
@@ -473,7 +473,7 @@ public class SecuritySettingsLoginShellTests
     {
         var api = new FakeCoreApi();
         var theme = new FakeTheme();
-        var vm = new SettingsViewModel(api, Make.Admin(), new FakeDialogs(), theme);
+        var vm = new SettingsViewModel(api, Make.Admin(), new FakeDialogs(), theme, new FakeRuntime());
         await vm.LoadAsync();
 
         await vm.SaveCommand.ExecuteAsync(null);
@@ -539,7 +539,7 @@ public class SecuritySettingsLoginShellTests
     [Fact]
     public void Shell_exposes_the_eight_sections_in_order()
     {
-        var shell = new ShellViewModel(new FakeCoreApi(), Make.Admin(), new FakeDialogs(), new FakeTheme());
+        var shell = new ShellViewModel(new FakeCoreApi(), Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         Assert.Equal(
             new[] { "Início", "Dispositivos", "Diagnósticos", "Histórico", "Módulos", "Backups", "Segurança", "Configurações" },
             shell.Items.Select(i => i.Title).ToArray());
@@ -551,7 +551,7 @@ public class SecuritySettingsLoginShellTests
         var api = new FakeCoreApi();
         api.Settings["ui.theme"] = JsonSerializer.SerializeToElement("light");
         var theme = new FakeTheme();
-        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), theme);
+        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), theme, new FakeRuntime());
 
         await shell.InitializeAsync();
         await Task.Delay(100); // a carga da página é disparada em segundo plano
@@ -565,7 +565,7 @@ public class SecuritySettingsLoginShellTests
     public async Task Shell_navigation_creates_each_page_once_and_loads_it()
     {
         var api = new FakeCoreApi();
-        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme());
+        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
 
         shell.SelectedItem = shell.Items[1];
         var first = shell.CurrentPage;
@@ -582,7 +582,7 @@ public class SecuritySettingsLoginShellTests
     {
         var api = new FakeCoreApi();
         var session = Make.Admin();
-        var shell = new ShellViewModel(api, session, new FakeDialogs(), new FakeTheme());
+        var shell = new ShellViewModel(api, session, new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         var requested = false;
         shell.LogoutRequested += (_, _) => requested = true;
 
@@ -597,7 +597,7 @@ public class SecuritySettingsLoginShellTests
     public async Task Shell_requests_login_when_a_page_loses_the_session()
     {
         var api = new FakeCoreApi { FailWith = new RpcException(RpcCodes.NotAuthenticated, "AuthenticationError", "Autenticação necessária.") };
-        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme());
+        var shell = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         var requested = false;
         shell.LogoutRequested += (_, _) => requested = true;
 
@@ -612,13 +612,13 @@ public class SecuritySettingsLoginShellTests
     {
         var api = new FakeCoreApi();
         var theme = new FakeTheme();
-        var admin = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), theme);
+        var admin = new ShellViewModel(api, Make.Admin(), new FakeDialogs(), theme, new FakeRuntime());
         await admin.ToggleThemeCommand.ExecuteAsync(null);
         Assert.Equal("light", theme.Current);
         Assert.Equal(1, api.CallCount("settings.set"));
 
         var viewerApi = new FakeCoreApi();
-        var viewer = new ShellViewModel(viewerApi, Make.Viewer(), new FakeDialogs(), new FakeTheme());
+        var viewer = new ShellViewModel(viewerApi, Make.Viewer(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         await viewer.ToggleThemeCommand.ExecuteAsync(null);
         Assert.Equal(0, viewerApi.CallCount("settings.set"));
     }

@@ -54,6 +54,12 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
     add("auth.login", lambda c, p: (c.login(p["name"], p["password"]), _whoami(c))[1],
         {"name": Param("str", max_len=64), "password": Param("str", max_len=PASSWORD_MAX)},
         requires_login=False, description="Entra com nome e senha.")
+    add("setup.status", lambda c, p: {"initialized": c.technicians.count() > 0}, requires_login=False,
+        description="Informa se já existe algum técnico (primeiro uso = ainda não).")
+    add("setup.create_admin", lambda c, p: (c.bootstrap_admin(p["name"], p["password"]), _whoami(c))[1],
+        {"name": Param("str", max_len=64), "password": Param("str", max_len=PASSWORD_MAX)},
+        requires_login=False,
+        description="Cria o PRIMEIRO administrador. O núcleo recusa se já houver qualquer técnico.")
     add("auth.logout", lambda c, p: (c.logout(), {"ok": True})[1], requires_login=False)
     add("auth.whoami", lambda c, p: _whoami(c), requires_login=False)
     add("auth.change_password",
@@ -63,6 +69,10 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
     # --- painel e segurança -------------------------------------------------------------
     add("status.get", lambda c, p: c.status(), description="Painel inicial (dados reais do núcleo).")
     add("security.overview", lambda c, p: c.security_overview())
+    add("system.paths", lambda c, p: {
+        "home": str(c.paths.home), "database": str(c.paths.db), "logs": str(c.paths.logs),
+        "backups": str(c.paths.backups), "modules": str(c.paths.modules)},
+        description="Onde o NEXUS guarda dados, logs, backups e módulos instalados.")
 
     # --- dispositivos ---------------------------------------------------------------------
     add("devices.list", lambda c, p: c.devices.list(p["connection"]),

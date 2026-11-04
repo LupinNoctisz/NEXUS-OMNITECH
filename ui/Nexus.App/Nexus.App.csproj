@@ -9,7 +9,16 @@
     <RootNamespace>Nexus.App</RootNamespace>
     <AssemblyName>NexusOmnitech</AssemblyName>
     <ApplicationTitle>NEXUS OMNITECH</ApplicationTitle>
+    <Version>0.1.0</Version>
+    <Company>LMF Informática</Company>
+    <Product>NEXUS OMNITECH</Product>
+    <ApplicationIcon>Assets\nexus.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\nexus.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Nexus.CoreClient\Nexus.CoreClient.csproj" />

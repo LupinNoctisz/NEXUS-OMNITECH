@@ -12,6 +12,18 @@ public interface IDialogService
     void ShowInfo(string title, string message);
 }
 
+/// <summary>Informações do ambiente de execução da interface (quem inicia o núcleo) e a escolha manual do Python.</summary>
+public interface IRuntimeInfo
+{
+    string AppVersion { get; }
+    string PythonPath { get; }
+    string PythonVersion { get; }
+    string CorePath { get; }
+
+    /// <summary>Abre a escolha do python.exe, valida e grava. Devolve a mensagem para o usuário (null se cancelou).</summary>
+    Task<string?> ChoosePythonAsync();
+}
+
 public interface IThemeService
 {
     string Current { get; }

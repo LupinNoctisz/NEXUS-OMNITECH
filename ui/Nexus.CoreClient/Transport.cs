@@ -16,6 +16,9 @@ public interface IRpcTransport : IAsyncDisposable
 /// <summary>Como iniciar o núcleo Python (processo filho, sem porta de rede).</summary>
 public sealed record CoreLaunchOptions(string PythonPath, string CorePath, string? HomePath)
 {
+    /// <summary>Versão do Python escolhida (informativa).</summary>
+    public Version? PythonVersion { get; init; }
+
     /// <summary>
     /// NEXUS_PYTHON (padrão "python"), NEXUS_CORE_PATH (pasta que contém o pacote "nexus", ex.: .../src)
     /// e NEXUS_HOME (opcional). Sem NEXUS_CORE_PATH, procura "src/nexus" subindo a partir do executável.
@@ -37,8 +40,14 @@ public sealed record CoreLaunchOptions(string PythonPath, string CorePath, strin
         return new CoreLaunchOptions(python, corePath, string.IsNullOrWhiteSpace(home) ? null : home);
     }
 
-    private static string? FindCorePath()
+    /// <summary>
+    /// Instalado: &lt;pasta do app&gt;\core\nexus. Desenvolvimento: sobe a partir do executável procurando "src/nexus".
+    /// </summary>
+    public static string? FindCorePath()
     {
+        var installed = Path.Combine(AppContext.BaseDirectory, "core");
+        if (File.Exists(Path.Combine(installed, "nexus", "__init__.py"))) return installed;
+
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         for (var depth = 0; depth < 10 && directory is not null; depth++, directory = directory.Parent)
         {
@@ -150,12 +159,24 @@ public sealed class ProcessTransport : IRpcTransport
         return await _stdout.ReadLineAsync(ct).ConfigureAwait(false);
     }
 
+    /// <summary>true se o núcleo não encerrou sozinho ao fechar a entrada e precisou ser finalizado à força.</summary>
+    public bool KilledOnDispose { get; private set; }
+
+    /// <summary>Código de saída do núcleo (disponível depois de DisposeAsync).</summary>
+    public int? ExitCode { get; private set; }
+
     public ValueTask DisposeAsync()
     {
         try { _stdin.Close(); } catch (IOException) { }
         try
         {
-            if (!_process.WaitForExit(2000)) _process.Kill(true);
+            if (!_process.WaitForExit(5000))
+            {
+                KilledOnDispose = true;
+                _process.Kill(true);
+                _process.WaitForExit(2000);
+            }
+            if (_process.HasExited) ExitCode = _process.ExitCode;
         }
         catch (InvalidOperationException) { }
         _process.Dispose();

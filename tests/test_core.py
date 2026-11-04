@@ -229,3 +229,14 @@ def test_status_reports_real_state(core):
     assert any("backup" in a["message"].lower() for a in status["alerts"])
     core.db.execute("UPDATE operations SET outcome = 'x' WHERE id = 1")
     assert any(a["level"] == "critical" for a in core.status()["alerts"])
+
+
+def test_default_home_uses_localappdata_on_windows(monkeypatch, tmp_path):
+    from nexus.core import paths
+
+    monkeypatch.delenv("NEXUS_HOME", raising=False)
+    monkeypatch.setattr(paths.sys, "platform", "win32")
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "Local"))
+    assert paths.default_home() == tmp_path / "Local" / "NexusOmnitech"
+    monkeypatch.setenv("NEXUS_HOME", str(tmp_path / "custom"))
+    assert paths.default_home() == tmp_path / "custom"

@@ -28,6 +28,15 @@ public sealed class CoreApi : ICoreApi
     public Task<HelloInfo> HelloAsync(CancellationToken ct = default)
         => _rpc.InvokeAsync<HelloInfo>("rpc.hello", null, ct);
 
+    public Task<SetupStatus> GetSetupStatusAsync(CancellationToken ct = default)
+        => _rpc.InvokeAsync<SetupStatus>("setup.status", null, ct);
+
+    public Task<WhoAmI> CreateAdminAsync(string name, string password, CancellationToken ct = default)
+        => _rpc.InvokeAsync<WhoAmI>("setup.create_admin", P(("name", name), ("password", password)), ct);
+
+    public Task<SystemPaths> GetSystemPathsAsync(CancellationToken ct = default)
+        => _rpc.InvokeAsync<SystemPaths>("system.paths", null, ct);
+
     public Task<WhoAmI> LoginAsync(string name, string password, CancellationToken ct = default)
         => _rpc.InvokeAsync<WhoAmI>("auth.login", P(("name", name), ("password", password)), ct);
 

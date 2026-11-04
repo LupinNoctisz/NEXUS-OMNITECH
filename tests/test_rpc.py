@@ -279,3 +279,47 @@ def test_real_subprocess_end_to_end(tmp_path):
     assert responses[3]["result"]["role"] == "admin"
     assert responses[4]["result"]["actor"] == "lmf" and responses[4]["result"]["audit"]["ok"] is True
     assert PASSWORD not in result.stdout.decode() and PASSWORD not in result.stderr.decode()
+
+
+# --- primeiro uso (setup.*) ----------------------------------------------------------------
+@pytest.fixture
+def fresh_rpc(tmp_path):
+    with NexusCore(home=tmp_path / "novo", module_dirs=[tmp_path / "m"]) as empty:
+        yield Client(RpcServer(empty)), empty
+
+
+def test_setup_status_reports_first_run_and_needs_no_login(fresh_rpc):
+    rpc, _ = fresh_rpc
+    assert rpc.ok("setup.status") == {"initialized": False}
+
+
+def test_setup_creates_first_admin_logged_in_and_only_once(fresh_rpc):
+    rpc, core = fresh_rpc
+    who = rpc.ok("setup.create_admin", name="primeiro", password=PASSWORD)
+    assert who["actor"] == "primeiro" and who["role"] == "admin" and who["authenticated"] is True
+    assert rpc.ok("setup.status") == {"initialized": True}
+    assert core.audit.recent(1)[0]["action"] == "technician.bootstrap"
+    second = rpc.err("setup.create_admin", name="intruso", password=PASSWORD)
+    assert "já foi inicializado" in second["message"]
+    assert core.technicians.get("intruso") is None
+
+
+def test_setup_rejects_weak_password_and_creates_nothing(fresh_rpc):
+    rpc, core = fresh_rpc
+    error = rpc.err("setup.create_admin", name="primeiro", password="curta")
+    assert error["code"] == proto.VALIDATION_ERROR
+    assert core.technicians.count() == 0
+
+
+def test_setup_is_refused_when_technicians_already_exist(rpc):
+    error = rpc.err("setup.create_admin", name="outro", password=PASSWORD)
+    assert "já foi inicializado" in error["message"]
+
+
+def test_system_paths_are_real_and_require_login(rpc, core):
+    assert rpc.err("system.paths")["code"] == proto.NOT_AUTHENTICATED
+    rpc.ok("auth.login", name="admin", password=PASSWORD)
+    paths = rpc.ok("system.paths")
+    assert Path(paths["home"]) == core.paths.home
+    assert Path(paths["database"]) == core.paths.db and Path(paths["database"]).is_file()
+    assert set(paths) == {"home", "database", "logs", "backups", "modules"}

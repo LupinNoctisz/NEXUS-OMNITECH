@@ -7,6 +7,9 @@ namespace Nexus.CoreClient;
 public sealed record HelloInfo(string Protocol, string CoreVersion, int SchemaVersion, List<string> Methods,
     string Actor, string Role, List<string> Permissions, bool Authenticated);
 
+public sealed record SetupStatus(bool Initialized);
+public sealed record SystemPaths(string Home, string Database, string Logs, string Backups, string Modules);
+
 public sealed record WhoAmI(string Actor, string Role, List<string> Permissions, bool Authenticated);
 
 public sealed record OkResult(bool Ok);

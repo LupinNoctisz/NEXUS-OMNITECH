@@ -8,14 +8,17 @@ namespace Nexus.Presentation;
 public sealed partial class SettingsViewModel : PageViewModel
 {
     private readonly IThemeService _theme;
+    private readonly IRuntimeInfo _runtime;
     private string _loadedTheme = "dark";
     private int _loadedKeep = 10;
     private string _loadedLogLevel = "INFO";
 
-    public SettingsViewModel(ICoreApi api, ISessionContext session, IDialogService dialogs, IThemeService theme)
+    public SettingsViewModel(ICoreApi api, ISessionContext session, IDialogService dialogs, IThemeService theme,
+        IRuntimeInfo runtime)
         : base(api, session, dialogs)
     {
         _theme = theme;
+        _runtime = runtime;
     }
 
     public override string Title => "Configurações";
@@ -36,6 +39,11 @@ public sealed partial class SettingsViewModel : PageViewModel
     [ObservableProperty] private string _publishersText = "—";
     [ObservableProperty] private string _coreText = "—";
     [ObservableProperty] private string? _message;
+    [ObservableProperty] private string _pythonText = "—";
+    [ObservableProperty] private string _appText = "—";
+    [ObservableProperty] private string _dataText = "—";
+    [ObservableProperty] private string _backupsPathText = "—";
+    [ObservableProperty] private string _logsPathText = "—";
 
     protected override async Task LoadCoreAsync()
     {
@@ -57,6 +65,12 @@ public sealed partial class SettingsViewModel : PageViewModel
             ? string.Join(", ", publishers.EnumerateArray().Select(p => p.GetString() ?? ""))
             : "—";
         CoreText = $"Núcleo {hello.CoreVersion} · protocolo {hello.Protocol} · banco v{hello.SchemaVersion}";
+        AppText = $"Interface {_runtime.AppVersion}";
+        PythonText = $"Python {_runtime.PythonVersion} — {_runtime.PythonPath}";
+        var paths = await Api.GetSystemPathsAsync();
+        DataText = paths.Home;
+        BackupsPathText = paths.Backups;
+        LogsPathText = paths.Logs;
     }
 
     [RelayCommand]
@@ -90,6 +104,13 @@ public sealed partial class SettingsViewModel : PageViewModel
             : $"{changed} configuração(ões) salva(s). O nível de log vale a partir da próxima execução.";
         await LoadCoreAsync();
     });
+
+    [RelayCommand]
+    private async Task ChoosePythonAsync()
+    {
+        var result = await _runtime.ChoosePythonAsync();
+        if (result is not null) Message = result;
+    }
 
     private static string Read(Dictionary<string, JsonElement> settings, string key, string fallback)
         => settings.TryGetValue(key, out var value) && value.ValueKind == JsonValueKind.String
