@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 
 import pytest
 
@@ -102,6 +103,7 @@ def test_provider_failure_is_isolated(core):
     assert "broken" in report.errors
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="o sysfs do Linux usa nomes com ':' (inválidos no NTFS); o parser é testado no CI Linux")
 def test_usb_linux_sysfs_parsing(tmp_path):
     dev = tmp_path / "1-2"
     dev.mkdir()
