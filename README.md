@@ -3,9 +3,9 @@
 
 Plataforma profissional de diagnóstico, manutenção e reparação tecnológica para técnicos e assistências técnicas.
 
-> **Estado atual: Etapa 1 (núcleo) e Fase 0 (segurança) concluídas; Etapa 2 (interface WPF) escrita, ainda NÃO validada em Windows.**
-> A interface (`ui/`) foi escrita sem acesso a um compilador .NET: ela só é considerada funcional depois que o workflow
-> *Interface (.NET/WPF)* passar e alguém abrir o aplicativo no Windows. Veja [ui/README.md](ui/README.md).
+> **Estado atual: Etapa 1 (núcleo) e Fase 0 (segurança) concluídas; Etapa 2 (interface WPF) compilada e testada no CI do Windows; aparência ainda não revisada por um humano.**
+> A interface (`ui/`) compila e passa 64 testes automáticos (incluindo ponta a ponta com o núcleo real), mas **ninguém abriu a janela ainda**:
+> layout, cores e usabilidade precisam do seu teste no Windows. Veja [ui/README.md](ui/README.md).
 > Os módulos de diagnóstico (PC, Mobile, Console, Electronics Lab, Intelligence) estão **planejados** e
 > aparecem como `planned` / "Não implementado" — nenhum deles gera resultados ainda.
 
@@ -25,7 +25,7 @@ Plataforma profissional de diagnóstico, manutenção e reparação tecnológica
 | Backups com checksum e restauração segura | ✅ |
 | Painel inicial (`nexus status`) com alertas reais | ✅ |
 | API local para a interface (JSON-RPC por stdio, lista fechada de métodos) | ✅ |
-| Interface WPF (login, 8 seções, tema escuro/claro) com dados reais do núcleo | 🟡 escrita; compilação/testes só no CI do Windows |
+| Interface WPF (login, 8 seções, tema escuro/claro) com dados reais do núcleo | 🟡 compila e testa no CI; falta revisão visual |
 | Atualizador, gerenciador de drivers | ⏳ etapas seguintes |
 | Sincronização, licenciamento | ⏳ etapa 8 |
 

@@ -4,9 +4,9 @@ A interface **não calcula nem inventa nada**: toda informação exibida vem do 
 ([protocolo](../docs/PROTOCOL.md)). Ela inicia o núcleo como **processo filho** (`python -m nexus serve --stdio`),
 sem porta de rede, e não executa comandos do sistema.
 
-> **Estado honesto:** este código foi escrito num ambiente **sem compilador .NET**. Nada aqui foi compilado ou
-> executado localmente. Quem valida é o workflow `.github/workflows/dotnet.yml` (Windows) e o seu teste no Windows.
-> Erros de compilação ou de XAML são esperados na primeira rodada — envie a saída do `dotnet build`.
+> **Estado honesto:** o código foi escrito sem compilador .NET local; quem o compila e testa é o workflow
+> `.github/workflows/dotnet.yml` (Windows), que passou (build + 64 testes, incluindo ponta a ponta com o núcleo real).
+> **Ninguém ainda abriu a janela:** erros de layout/XAML em tempo de execução, cores e usabilidade só aparecem no seu teste.
 
 ## Projetos
 | Projeto | Papel |
