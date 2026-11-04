@@ -1,0 +1,78 @@
+{
+  "jsonrpc": "2.0",
+  "id": 12,
+  "result": [
+    {
+      "id": "nexus.console_tools",
+      "name": "NEXUS Console Tools",
+      "version": "0.0.0",
+      "publisher": "LMF Informática",
+      "status": "planned",
+      "registered": false,
+      "enabled": false,
+      "loaded": false,
+      "integrity_ok": null,
+      "problems": []
+    },
+    {
+      "id": "nexus.demo",
+      "name": "Módulo de demonstração",
+      "version": "1.0.0",
+      "publisher": "LMF Informática",
+      "status": "available",
+      "registered": true,
+      "enabled": true,
+      "loaded": false,
+      "integrity_ok": true,
+      "problems": []
+    },
+    {
+      "id": "nexus.electronics_lab",
+      "name": "NEXUS Electronics Lab",
+      "version": "0.0.0",
+      "publisher": "LMF Informática",
+      "status": "planned",
+      "registered": false,
+      "enabled": false,
+      "loaded": false,
+      "integrity_ok": null,
+      "problems": []
+    },
+    {
+      "id": "nexus.intelligence",
+      "name": "NEXUS Intelligence",
+      "version": "0.0.0",
+      "publisher": "LMF Informática",
+      "status": "planned",
+      "registered": false,
+      "enabled": false,
+      "loaded": false,
+      "integrity_ok": null,
+      "problems": []
+    },
+    {
+      "id": "nexus.mobile_tools",
+      "name": "NEXUS Mobile Tools",
+      "version": "0.0.0",
+      "publisher": "LMF Informática",
+      "status": "planned",
+      "registered": false,
+      "enabled": false,
+      "loaded": false,
+      "integrity_ok": null,
+      "problems": []
+    },
+    {
+      "id": "nexus.pc_diagnostics",
+      "name": "NEXUS PC Diagnostics",
+      "version": "0.0.0",
+      "publisher": "LMF Informática",
+      "status": "planned",
+      "registered": false,
+      "enabled": false,
+      "loaded": false,
+      "integrity_ok": null,
+      "problems": []
+    }
+  ]
+}

@@ -5,7 +5,7 @@ Cada etapa só começa após a anterior estar testada e documentada. Antes de ca
 | # | Etapa | Situação |
 |---|---|---|
 | 1 | Arquitetura e núcleo | ✅ concluída (restam: atualizador, gerenciador de drivers) |
-| 2 | Interface e navegação (tema escuro/claro, 12 seções, tela Início) | ⏳ |
+| 2 | Interface e navegação (tema escuro/claro, 8 seções iniciais, tela Início) | 🟡 código escrito; aguardando CI/Windows (as demais seções do projeto entram com seus módulos) |
 | 3 | Diagnóstico de computadores (SMART, temperaturas, RAM, drivers, boot, integridade) | ⏳ |
 | 4 | Ferramentas mobile (ADB, Fastboot, drivers; suporte por fabricante sem presumir protocolos iguais) | ⏳ |
 | 5 | Consoles (PlayStation, Xbox, Nintendo — apenas o que cada fabricante permite) | ⏳ |

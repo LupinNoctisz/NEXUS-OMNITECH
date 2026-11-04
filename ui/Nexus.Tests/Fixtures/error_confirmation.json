@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": 18,
+  "error": {
+    "code": -32003,
+    "message": "A restauração substitui todos os dados locais. Confirme explicitamente.",
+    "data": {
+      "type": "ConfirmationRequired"
+    }
+  }
+}

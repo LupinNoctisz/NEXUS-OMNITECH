@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "result": {
+    "actor": "tecnico.demo",
+    "role": "admin",
+    "permissions": [
+      "audit.read",
+      "backup.manage",
+      "backup.restore",
+      "destructive.run",
+      "devices.manage",
+      "devices.read",
+      "diagnostics.run",
+      "modules.manage",
+      "sessions.run",
+      "settings.write",
+      "technicians.manage"
+    ],
+    "authenticated": true
+  }
+}

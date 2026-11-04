@@ -1,0 +1,109 @@
+<UserControl x:Class="Nexus.App.Views.SecurityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+            </DockPanel>
+            <ContentControl ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="ESTADO ATUAL" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Margin="0,0,0,3"><Run Text="Técnico: "/><Run Text="{Binding ActorText, Mode=OneWay}" FontWeight="SemiBold"/><Run Text="  ·  "/><Run Text="{Binding RoleText, Mode=OneWay}"/></TextBlock>
+                    <TextBlock Text="{Binding AuditText, StringFormat='Histórico de operações: {0}'}" Foreground="{Binding AuditOk, Converter={StaticResource BoolBrush}}" Margin="0,0,0,3"/>
+                    <TextBlock Text="{Binding DatabaseText, StringFormat='Banco de dados: {0}'}" Foreground="{Binding DatabaseOk, Converter={StaticResource BoolBrush}}" Margin="0,0,0,3"/>
+                    <TextBlock Text="{Binding TechniciansText, StringFormat='Técnicos: {0}'}" Margin="0,0,0,3"/>
+                    <TextBlock Text="{Binding PublishersText, StringFormat='Publicadores confiáveis: {0}'}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,10,0,0" Visibility="{Binding Findings.Count, Converter={StaticResource CountVisible}}">
+                <StackPanel>
+                    <TextBlock Text="PONTOS DE ATENÇÃO" Style="{StaticResource SectionTitle}"/>
+                    <ItemsControl ItemsSource="{Binding Findings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate><TextBlock Text="{Binding}" Foreground="{DynamicResource WarnBrush}" TextWrapping="Wrap" Margin="0,0,0,3"/></DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Text="SUAS PERMISSÕES" Style="{StaticResource SectionTitle}"/>
+                    <ItemsControl ItemsSource="{Binding Permissions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="3" Padding="6,2" Margin="0,0,6,6">
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="TÉCNICOS" Style="{StaticResource SectionTitle}" Margin="0,16,0,6"/>
+            <DataGrid ItemsSource="{Binding Technicians}" MaxHeight="220">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nome" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Papel" Binding="{Binding RoleText}" Width="*"/>
+                    <DataGridTextColumn Header="Situação" Binding="{Binding ActiveText}" Width="*"/>
+                    <DataGridTextColumn Header="Senha" Binding="{Binding PasswordText}" Width="*"/>
+                    <DataGridTextColumn Header="Bloqueio" Binding="{Binding LockText}" Width="1.5*"/>
+                    <DataGridTemplateColumn Header="" Width="130">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Ativar/Desativar" Margin="0" Padding="6,2" FontSize="11"
+                                        Command="{Binding DataContext.ToggleActiveCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        IsEnabled="{Binding DataContext.CanManageTechnicians, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Text="{Binding TechnicianMessage}" Style="{StaticResource Muted}" Margin="0,6,0,0"
+                       Visibility="{Binding TechnicianMessage, Converter={StaticResource TextVisible}}"/>
+
+            <Grid Margin="0,14,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="ALTERAR MINHA SENHA" Style="{StaticResource SectionTitle}"/>
+                        <PasswordBox x:Name="OldBox" Margin="0,0,0,6" ToolTip="Senha atual"/>
+                        <PasswordBox x:Name="NewBox" Margin="0,0,0,6" ToolTip="Nova senha (mín. 10 caracteres)"/>
+                        <PasswordBox x:Name="NewConfirmBox" Margin="0,0,0,8" ToolTip="Confirmar nova senha"/>
+                        <Button Content="Alterar senha" Click="ChangePassword_Click" Margin="0" HorizontalAlignment="Left"/>
+                        <TextBlock Text="{Binding PasswordMessage}" Style="{StaticResource Muted}" Margin="0,6,0,0"
+                                   Visibility="{Binding PasswordMessage, Converter={StaticResource TextVisible}}"/>
+                        <TextBlock Text="Informe: atual, nova e confirmação, nessa ordem." Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource Card}" Margin="8,0,0,0"
+                        Visibility="{Binding CanManageTechnicians, Converter={StaticResource BoolVisible}}">
+                    <StackPanel>
+                        <TextBlock Text="NOVO TÉCNICO" Style="{StaticResource SectionTitle}"/>
+                        <TextBox Text="{Binding NewTechnicianName, UpdateSourceTrigger=PropertyChanged}" ToolTip="Nome do técnico" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding RoleOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                  SelectedValue="{Binding NewTechnicianRole, Mode=TwoWay}" Margin="0,0,0,6"/>
+                        <PasswordBox x:Name="TechPasswordBox" Margin="0,0,0,6" ToolTip="Senha inicial"/>
+                        <PasswordBox x:Name="TechConfirmBox" Margin="0,0,0,8" ToolTip="Confirmar senha"/>
+                        <Button Content="Adicionar técnico" Click="AddTechnician_Click" Margin="0" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

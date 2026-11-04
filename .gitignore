@@ -55,3 +55,8 @@ id_ed25519*
 keys/
 licenses/private/
 signing/
+
+# .NET / Visual Studio (complemento)
+*.user
+*.trx
+TestResults/

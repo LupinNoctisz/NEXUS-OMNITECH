@@ -1,0 +1,66 @@
+{
+  "jsonrpc": "2.0",
+  "id": 10,
+  "result": [
+    {
+      "id": 13,
+      "ts": "2026-11-04T01:25:33+00:00",
+      "technician": "tecnico.demo",
+      "action": "device.scan",
+      "target": null,
+      "session_id": null,
+      "details": "{\"errors\":{},\"found\":1}",
+      "outcome": "ok",
+      "prev_hash": "cc4da2b1ac76fc943f43716c70eb6ad9853fa4dc7f6ddf84d28d853be9f8d8c4",
+      "hash": "1ac574bea6be920a3bce5434e8e54ef1b498e297f6d5d1dbfb8f532c28b848b6"
+    },
+    {
+      "id": 12,
+      "ts": "2026-11-04T01:25:33+00:00",
+      "technician": "tecnico.demo",
+      "action": "auth.login",
+      "target": null,
+      "session_id": null,
+      "details": "{}",
+      "outcome": "ok",
+      "prev_hash": "22bf75dccda3f80b2ccfe09f92f6cb9eb0881dab4f0e3385855b65ae080603d6",
+      "hash": "cc4da2b1ac76fc943f43716c70eb6ad9853fa4dc7f6ddf84d28d853be9f8d8c4"
+    },
+    {
+      "id": 11,
+      "ts": "2026-11-04T01:25:33+00:00",
+      "technician": "tecnico.demo",
+      "action": "auth.logout",
+      "target": null,
+      "session_id": null,
+      "details": "{}",
+      "outcome": "ok",
+      "prev_hash": "9e5a3e6bd915d3ad75ccb02c1c051ffd5699df2ad191f815e4e9bca92c50aaf5",
+      "hash": "22bf75dccda3f80b2ccfe09f92f6cb9eb0881dab4f0e3385855b65ae080603d6"
+    },
+    {
+      "id": 10,
+      "ts": "2026-11-04T01:25:33+00:00",
+      "technician": "tecnico.demo",
+      "action": "backup.create",
+      "target": "nexus-20261104-012533-demo.db",
+      "session_id": null,
+      "details": "{\"reason\":\"demo\",\"sha256\":\"10144c47df42ad7b9f12e2897636549ec2cabf7278888c4eb077b7fad18f5263\"}",
+      "outcome": "ok",
+      "prev_hash": "cad642b637049391ab01556b884fa688e610fca907543dc7b36ae99602b0b3c8",
+      "hash": "9e5a3e6bd915d3ad75ccb02c1c051ffd5699df2ad191f815e4e9bca92c50aaf5"
+    },
+    {
+      "id": 9,
+      "ts": "2026-11-04T01:25:33+00:00",
+      "technician": "tecnico.demo",
+      "action": "module.enable",
+      "target": "nexus.demo",
+      "session_id": null,
+      "details": "{}",
+      "outcome": "ok",
+      "prev_hash": "c2c9fe15d4b8e1fbd38cc374ebd02d4dedb47375c8b6383099f204bba400a541",
+      "hash": "cad642b637049391ab01556b884fa688e610fca907543dc7b36ae99602b0b3c8"
+    }
+  ]
+}

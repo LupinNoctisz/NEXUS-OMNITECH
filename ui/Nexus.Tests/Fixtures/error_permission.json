@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": 21,
+  "error": {
+    "code": -32001,
+    "message": "'leitor.demo' (viewer) não possui a permissão 'devices.manage'.",
+    "data": {
+      "type": "PermissionDenied"
+    }
+  }
+}

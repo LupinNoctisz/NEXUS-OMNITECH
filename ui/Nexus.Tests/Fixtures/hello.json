@@ -1,0 +1,50 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocol": "1.0",
+    "core_version": "0.1.0",
+    "schema_version": 2,
+    "methods": [
+      "audit.list",
+      "audit.verify",
+      "auth.change_password",
+      "auth.login",
+      "auth.logout",
+      "auth.whoami",
+      "backups.create",
+      "backups.list",
+      "backups.restore",
+      "backups.verify",
+      "devices.add",
+      "devices.list",
+      "devices.scan",
+      "modules.disable",
+      "modules.enable",
+      "modules.list",
+      "modules.register",
+      "modules.verify",
+      "rpc.hello",
+      "rpc.shutdown",
+      "security.overview",
+      "sessions.finish",
+      "sessions.open",
+      "sessions.recent",
+      "sessions.start",
+      "settings.get_all",
+      "settings.set",
+      "status.get",
+      "technicians.add",
+      "technicians.list",
+      "technicians.set_active",
+      "technicians.set_password"
+    ],
+    "actor": "anonymous",
+    "role": "viewer",
+    "permissions": [
+      "audit.read",
+      "devices.read"
+    ],
+    "authenticated": false
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 14,
+  "result": [
+    {
+      "name": "nexus-20261104-012533-demo.db",
+      "size_bytes": 57344,
+      "modified_utc": "2026-11-04T01:25:33+00:00",
+      "has_checksum": true
+    }
+  ]
+}

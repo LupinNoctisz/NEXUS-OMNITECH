@@ -11,6 +11,7 @@
 ## Camadas
 ```
  UI WPF ──(stdio JSON-RPC, ver PROTOCOL.md)──► nexus.api (lista fechada de métodos)
+   Nexus.App (views) → Nexus.Presentation (ViewModels) → Nexus.CoreClient (JSON-RPC) — ver ui/README.md
  CLI (nexus)  ─────────────────────────────────►  NexusCore (fachada)
                     ├─ Database (SQLite, migrações, backup API)
                     ├─ AuditLog (hash encadeado)      ├─ SettingsStore

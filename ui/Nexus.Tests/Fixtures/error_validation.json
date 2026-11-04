@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": 19,
+  "error": {
+    "code": -32007,
+    "message": "Valor inválido para ui.theme: 'neon'",
+    "data": {
+      "type": "ValidationError"
+    }
+  }
+}

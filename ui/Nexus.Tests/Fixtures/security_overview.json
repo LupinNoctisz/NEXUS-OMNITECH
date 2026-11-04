@@ -1,0 +1,74 @@
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "result": {
+    "actor": "tecnico.demo",
+    "role": "admin",
+    "permissions": [
+      "audit.read",
+      "backup.manage",
+      "backup.restore",
+      "destructive.run",
+      "devices.manage",
+      "devices.read",
+      "diagnostics.run",
+      "modules.manage",
+      "sessions.run",
+      "settings.write",
+      "technicians.manage"
+    ],
+    "audit": {
+      "ok": true,
+      "records": 12,
+      "first_bad_id": null
+    },
+    "database_integrity": true,
+    "technicians": {
+      "total": 2,
+      "active": 2,
+      "without_password": 0,
+      "locked": 0
+    },
+    "trusted_publishers": [
+      "LMF Informática"
+    ],
+    "modules": [
+      {
+        "id": "nexus.console_tools",
+        "status": "planned",
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.demo",
+        "status": "available",
+        "integrity_ok": true,
+        "problems": []
+      },
+      {
+        "id": "nexus.electronics_lab",
+        "status": "planned",
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.intelligence",
+        "status": "planned",
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.mobile_tools",
+        "status": "planned",
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.pc_diagnostics",
+        "status": "planned",
+        "integrity_ok": null,
+        "problems": []
+      }
+    ]
+  }
+}

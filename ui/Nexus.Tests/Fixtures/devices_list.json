@@ -1,0 +1,38 @@
+{
+  "jsonrpc": "2.0",
+  "id": 6,
+  "result": [
+    {
+      "id": 1,
+      "uid": "usb:18d1:4ee7:DEMO0001",
+      "kind": "usb",
+      "source": "demo",
+      "vendor": "Demo Vendor",
+      "model": "Demo Phone",
+      "serial": "DEMO0001",
+      "label": null,
+      "connection": "connected",
+      "first_seen": "2026-11-04T01:25:33+00:00",
+      "last_seen": "2026-11-04T01:25:33+00:00",
+      "properties": {
+        "vendor_id": "18d1",
+        "product_id": "4ee7",
+        "speed_mbps": "480"
+      }
+    },
+    {
+      "id": 2,
+      "uid": "manual:6087e849251c",
+      "kind": "pc",
+      "source": "manual",
+      "vendor": "Demo",
+      "model": "Notebook Demo",
+      "serial": null,
+      "label": "Cliente Demo A",
+      "connection": "unknown",
+      "first_seen": "2026-11-04T01:25:33+00:00",
+      "last_seen": "2026-11-04T01:25:33+00:00",
+      "properties": {}
+    }
+  ]
+}

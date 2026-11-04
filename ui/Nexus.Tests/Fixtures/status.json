@@ -1,0 +1,208 @@
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "result": {
+    "version": "0.1.0",
+    "schema_version": 2,
+    "expected_schema_version": 2,
+    "mode": "local",
+    "actor": "tecnico.demo",
+    "role": "admin",
+    "devices_connected": [
+      {
+        "id": 1,
+        "uid": "usb:18d1:4ee7:DEMO0001",
+        "kind": "usb",
+        "source": "demo",
+        "vendor": "Demo Vendor",
+        "model": "Demo Phone",
+        "serial": "DEMO0001",
+        "label": null,
+        "connection": "connected",
+        "first_seen": "2026-11-04T01:25:33+00:00",
+        "last_seen": "2026-11-04T01:25:33+00:00",
+        "properties": {
+          "vendor_id": "18d1",
+          "product_id": "4ee7",
+          "speed_mbps": "480"
+        }
+      }
+    ],
+    "recent_sessions": [
+      {
+        "id": 2,
+        "device_id": 1,
+        "kind": "general",
+        "technician": "tecnico.demo",
+        "status": "open",
+        "started_at": "2026-11-04T01:25:33+00:00",
+        "ended_at": null,
+        "summary": null,
+        "device_label": null,
+        "device_model": "Demo Phone"
+      },
+      {
+        "id": 1,
+        "device_id": 2,
+        "kind": "pc_diagnostics",
+        "technician": "tecnico.demo",
+        "status": "completed",
+        "started_at": "2026-11-04T01:25:33+00:00",
+        "ended_at": "2026-11-04T01:25:33+00:00",
+        "summary": "Sessão de demonstração",
+        "device_label": "Cliente Demo A",
+        "device_model": "Notebook Demo"
+      }
+    ],
+    "recent_operations": [
+      {
+        "id": 12,
+        "ts": "2026-11-04T01:25:33+00:00",
+        "technician": "tecnico.demo",
+        "action": "auth.login",
+        "target": null,
+        "session_id": null,
+        "details": "{}",
+        "outcome": "ok",
+        "prev_hash": "22bf75dccda3f80b2ccfe09f92f6cb9eb0881dab4f0e3385855b65ae080603d6",
+        "hash": "cc4da2b1ac76fc943f43716c70eb6ad9853fa4dc7f6ddf84d28d853be9f8d8c4"
+      },
+      {
+        "id": 11,
+        "ts": "2026-11-04T01:25:33+00:00",
+        "technician": "tecnico.demo",
+        "action": "auth.logout",
+        "target": null,
+        "session_id": null,
+        "details": "{}",
+        "outcome": "ok",
+        "prev_hash": "9e5a3e6bd915d3ad75ccb02c1c051ffd5699df2ad191f815e4e9bca92c50aaf5",
+        "hash": "22bf75dccda3f80b2ccfe09f92f6cb9eb0881dab4f0e3385855b65ae080603d6"
+      },
+      {
+        "id": 10,
+        "ts": "2026-11-04T01:25:33+00:00",
+        "technician": "tecnico.demo",
+        "action": "backup.create",
+        "target": "nexus-20261104-012533-demo.db",
+        "session_id": null,
+        "details": "{\"reason\":\"demo\",\"sha256\":\"10144c47df42ad7b9f12e2897636549ec2cabf7278888c4eb077b7fad18f5263\"}",
+        "outcome": "ok",
+        "prev_hash": "cad642b637049391ab01556b884fa688e610fca907543dc7b36ae99602b0b3c8",
+        "hash": "9e5a3e6bd915d3ad75ccb02c1c051ffd5699df2ad191f815e4e9bca92c50aaf5"
+      },
+      {
+        "id": 9,
+        "ts": "2026-11-04T01:25:33+00:00",
+        "technician": "tecnico.demo",
+        "action": "module.enable",
+        "target": "nexus.demo",
+        "session_id": null,
+        "details": "{}",
+        "outcome": "ok",
+        "prev_hash": "c2c9fe15d4b8e1fbd38cc374ebd02d4dedb47375c8b6383099f204bba400a541",
+        "hash": "cad642b637049391ab01556b884fa688e610fca907543dc7b36ae99602b0b3c8"
+      },
+      {
+        "id": 8,
+        "ts": "2026-11-04T01:25:33+00:00",
+        "technician": "tecnico.demo",
+        "action": "module.register",
+        "target": "nexus.demo",
+        "session_id": null,
+        "details": "{\"manifest_sha256\":\"9a430708e4ee147230a061a68ddcd1d92dde418b7a00ac3ebd77f2cbd590057b\",\"reregistered\":false,\"version\":\"1.0.0\"}",
+        "outcome": "ok",
+        "prev_hash": "1e917076935fa9a75438f4905c8877a46726ebe3e780bd8cc17885a606eb38b3",
+        "hash": "c2c9fe15d4b8e1fbd38cc374ebd02d4dedb47375c8b6383099f204bba400a541"
+      }
+    ],
+    "modules": [
+      {
+        "id": "nexus.console_tools",
+        "name": "NEXUS Console Tools",
+        "version": "0.0.0",
+        "publisher": "LMF Informática",
+        "status": "planned",
+        "registered": false,
+        "enabled": false,
+        "loaded": false,
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.demo",
+        "name": "Módulo de demonstração",
+        "version": "1.0.0",
+        "publisher": "LMF Informática",
+        "status": "available",
+        "registered": true,
+        "enabled": true,
+        "loaded": false,
+        "integrity_ok": true,
+        "problems": []
+      },
+      {
+        "id": "nexus.electronics_lab",
+        "name": "NEXUS Electronics Lab",
+        "version": "0.0.0",
+        "publisher": "LMF Informática",
+        "status": "planned",
+        "registered": false,
+        "enabled": false,
+        "loaded": false,
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.intelligence",
+        "name": "NEXUS Intelligence",
+        "version": "0.0.0",
+        "publisher": "LMF Informática",
+        "status": "planned",
+        "registered": false,
+        "enabled": false,
+        "loaded": false,
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.mobile_tools",
+        "name": "NEXUS Mobile Tools",
+        "version": "0.0.0",
+        "publisher": "LMF Informática",
+        "status": "planned",
+        "registered": false,
+        "enabled": false,
+        "loaded": false,
+        "integrity_ok": null,
+        "problems": []
+      },
+      {
+        "id": "nexus.pc_diagnostics",
+        "name": "NEXUS PC Diagnostics",
+        "version": "0.0.0",
+        "publisher": "LMF Informática",
+        "status": "planned",
+        "registered": false,
+        "enabled": false,
+        "loaded": false,
+        "integrity_ok": null,
+        "problems": []
+      }
+    ],
+    "backups": {
+      "count": 1,
+      "latest": "nexus-20261104-012533-demo.db",
+      "latest_utc": "2026-11-04T01:25:33+00:00"
+    },
+    "sync": {
+      "state": "not_configured",
+      "detail": "Sincronização online será implementada na etapa 8."
+    },
+    "audit": {
+      "ok": true,
+      "records": 12
+    },
+    "alerts": []
+  }
+}

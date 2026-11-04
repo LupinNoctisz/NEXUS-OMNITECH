@@ -1,0 +1,421 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:p="clr-namespace:Nexus.Presentation;assembly=Nexus.Presentation"
+                    xmlns:v="clr-namespace:Nexus.App.Views"
+                    xmlns:conv="clr-namespace:Nexus.App.Converters">
+
+    <ResourceDictionary.MergedDictionaries>
+        <!-- estilos próprios (um dicionário mesclado não enxerga os "irmãos" no parse) -->
+        <ResourceDictionary Source="/Themes/Controls.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <conv:CountVisibleConverter x:Key="CountVisible"/>
+    <conv:NullVisibleConverter x:Key="NullVisible"/>
+    <conv:LevelBrushConverter x:Key="LevelBrush"/>
+    <conv:BoolBrushConverter x:Key="BoolBrush"/>
+    <conv:InverseBoolConverter x:Key="InverseBool"/>
+    <conv:TextVisibilityConverter x:Key="TextVisible"/>
+    <BooleanToVisibilityConverter x:Key="BoolVisible"/>
+
+    <!-- Barra de progresso + erro da página (Content = o ViewModel da página) -->
+    <DataTemplate x:Key="PageStatus">
+        <StackPanel>
+            <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisible}}"/>
+            <Border Style="{StaticResource Card}" Margin="0,8,0,0" BorderBrush="{DynamicResource CritBrush}"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolVisible}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource CritBrush}" TextWrapping="Wrap"/>
+            </Border>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type p:ShellViewModel}">
+        <v:ShellView/>
+    </DataTemplate>
+
+    <!-- ===================== Início ===================== -->
+    <DataTemplate DataType="{x:Type p:HomeViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+                </DockPanel>
+                <ContentControl ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+
+                <Border Style="{StaticResource Card}" Margin="0,12,0,10">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="10" Height="10" Margin="0,0,10,0" VerticalAlignment="Center"
+                                 Fill="{Binding OverallLevel, Converter={StaticResource LevelBrush}}"/>
+                        <TextBlock Text="{Binding OverallText}" FontSize="15" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding VersionText}" Style="{StaticResource Muted}" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Alerts}" Margin="0,0,0,6">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource Card}" Padding="10,6" Margin="0,0,0,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center"
+                                             Fill="{Binding Level, Converter={StaticResource LevelBrush}}"/>
+                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <UniformGrid Columns="3">
+                    <Border Style="{StaticResource Card}" Margin="0,0,10,10">
+                        <StackPanel><TextBlock Text="DISPOSITIVOS" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding DevicesText}" TextWrapping="Wrap"/></StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,10,10">
+                        <StackPanel><TextBlock Text="MÓDULOS" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding ModulesText}" TextWrapping="Wrap"/></StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+                        <StackPanel><TextBlock Text="BACKUPS" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding BackupText}" TextWrapping="Wrap"/></StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,10,10">
+                        <StackPanel><TextBlock Text="SINCRONIZAÇÃO" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding SyncText}" TextWrapping="Wrap"/></StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,0,10,10">
+                        <StackPanel><TextBlock Text="HISTÓRICO" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding AuditText}" TextWrapping="Wrap"/></StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <TextBlock Text="DISPOSITIVOS CONECTADOS" Style="{StaticResource SectionTitle}" Margin="0,10,0,6"/>
+                <DataGrid ItemsSource="{Binding ConnectedDevices}" MaxHeight="170">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Dispositivo" Binding="{Binding Title}" Width="2*"/>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding KindText}" Width="*"/>
+                        <DataGridTextColumn Header="Fabricante" Binding="{Binding Vendor}" Width="*"/>
+                        <DataGridTextColumn Header="Modelo" Binding="{Binding Model}" Width="*"/>
+                        <DataGridTextColumn Header="Visto em" Binding="{Binding LastSeen}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock Text="ÚLTIMOS ATENDIMENTOS" Style="{StaticResource SectionTitle}" Margin="0,14,0,6"/>
+                <DataGrid ItemsSource="{Binding RecentSessions}" MaxHeight="170">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Dispositivo" Binding="{Binding DeviceText}" Width="2*"/>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding KindText}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="*"/>
+                        <DataGridTextColumn Header="Técnico" Binding="{Binding Technician}" Width="*"/>
+                        <DataGridTextColumn Header="Início" Binding="{Binding Started}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock Text="ÚLTIMAS OPERAÇÕES" Style="{StaticResource SectionTitle}" Margin="0,14,0,6"/>
+                <DataGrid ItemsSource="{Binding RecentOperations}" MaxHeight="190">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Quando" Binding="{Binding When}" Width="*"/>
+                        <DataGridTextColumn Header="Técnico" Binding="{Binding Technician}" Width="*"/>
+                        <DataGridTextColumn Header="Ação" Binding="{Binding Action}" Width="*"/>
+                        <DataGridTextColumn Header="Resultado" Binding="{Binding Outcome}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ===================== Dispositivos ===================== -->
+    <DataTemplate DataType="{x:Type p:DevicesViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.ColumnSpan="2">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Procurar dispositivos" Command="{Binding ScanCommand}" IsEnabled="{Binding CanManage}"/>
+                    <Button Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+            </DockPanel>
+            <ContentControl Grid.Row="1" Grid.ColumnSpan="2" ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+            <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,8,0,0"
+                       Visibility="{Binding Message, Converter={StaticResource TextVisible}}"/>
+
+            <DataGrid Grid.Row="3" Grid.Column="0" Margin="0,12,12,0" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Dispositivo" Binding="{Binding Title}" Width="2*"/>
+                    <DataGridTextColumn Header="Tipo" Binding="{Binding KindText}" Width="*"/>
+                    <DataGridTextColumn Header="Fabricante" Binding="{Binding Vendor}" Width="*"/>
+                    <DataGridTextColumn Header="Modelo" Binding="{Binding Model}" Width="*"/>
+                    <DataGridTextColumn Header="Serial" Binding="{Binding Serial}" Width="*"/>
+                    <DataGridTextColumn Header="Conexão" Binding="{Binding ConnectionText}" Width="*"/>
+                    <DataGridTextColumn Header="Visto em" Binding="{Binding LastSeen}" Width="1.3*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <ScrollViewer Grid.Row="3" Grid.Column="1" Margin="0,12,0,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="DETALHES" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Selecione um dispositivo." Style="{StaticResource Muted}"
+                                       Visibility="{Binding SelectedDevice, Converter={StaticResource NullVisible}}"/>
+                            <ItemsControl ItemsSource="{Binding Details}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,6">
+                                            <TextBlock Text="{Binding Key}" Style="{StaticResource Muted}" FontSize="11"/>
+                                            <TextBlock Text="{Binding Value}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" Margin="0,10,0,0" IsEnabled="{Binding CanManage}">
+                        <StackPanel>
+                            <TextBlock Text="CADASTRAR MANUALMENTE" Style="{StaticResource SectionTitle}"/>
+                            <ComboBox ItemsSource="{Binding KindOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                      SelectedValue="{Binding NewKind, Mode=TwoWay}" Margin="0,0,0,6"/>
+                            <TextBox Text="{Binding NewLabel, UpdateSourceTrigger=PropertyChanged}" ToolTip="Identificação (ex.: cliente/OS)" Margin="0,0,0,6"/>
+                            <TextBox Text="{Binding NewVendor, UpdateSourceTrigger=PropertyChanged}" ToolTip="Fabricante" Margin="0,0,0,6"/>
+                            <TextBox Text="{Binding NewModel, UpdateSourceTrigger=PropertyChanged}" ToolTip="Modelo" Margin="0,0,0,6"/>
+                            <TextBox Text="{Binding NewSerial, UpdateSourceTrigger=PropertyChanged}" ToolTip="Serial" Margin="0,0,0,8"/>
+                            <Button Content="Cadastrar" Command="{Binding AddCommand}" Style="{StaticResource PrimaryButton}" Margin="0"/>
+                            <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,8,0,0"
+                                       Text="Campos: identificação, fabricante, modelo e serial (preencha ao menos um)."/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DataTemplate>
+
+    <!-- ===================== Diagnósticos ===================== -->
+    <DataTemplate DataType="{x:Type p:DiagnosticsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+                </DockPanel>
+                <ContentControl ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+
+                <Border Style="{StaticResource Card}" Margin="0,12,0,0" BorderBrush="{DynamicResource WarnBrush}"
+                        Visibility="{Binding ShowNotImplementedNotice, Converter={StaticResource BoolVisible}}">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Os módulos de diagnóstico (PC, Mobile, Console, Eletrônica e Inteligência) ainda NÃO estão implementados. Nenhum teste é executado e nenhum resultado de diagnóstico é exibido. Por enquanto é possível registrar e acompanhar sessões de atendimento."/>
+                </Border>
+
+                <Border Style="{StaticResource Card}" Margin="0,12,0,0" IsEnabled="{Binding CanRun}">
+                    <StackPanel>
+                        <TextBlock Text="NOVA SESSÃO" Style="{StaticResource SectionTitle}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox Width="280" ItemsSource="{Binding Devices}" DisplayMemberPath="Title" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" Margin="0,0,8,0"/>
+                            <ComboBox Width="180" ItemsSource="{Binding KindOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                      SelectedValue="{Binding SelectedKind, Mode=TwoWay}" Margin="0,0,8,0"/>
+                            <Button Content="Iniciar sessão" Command="{Binding StartCommand}" Style="{StaticResource PrimaryButton}" Margin="0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,8,0,0"
+                           Visibility="{Binding Message, Converter={StaticResource TextVisible}}"/>
+
+                <TextBlock Text="SESSÕES" Style="{StaticResource SectionTitle}" Margin="0,14,0,6"/>
+                <DataGrid ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession, Mode=TwoWay}" MaxHeight="240">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                        <DataGridTextColumn Header="Dispositivo" Binding="{Binding DeviceText}" Width="2*"/>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding KindText}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="*"/>
+                        <DataGridTextColumn Header="Técnico" Binding="{Binding Technician}" Width="*"/>
+                        <DataGridTextColumn Header="Início" Binding="{Binding Started}" Width="*"/>
+                        <DataGridTextColumn Header="Fim" Binding="{Binding Ended}" Width="*"/>
+                        <DataGridTextColumn Header="Resumo" Binding="{Binding Summary}" Width="2*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0" IsEnabled="{Binding CanRun}">
+                    <TextBox Width="360" Text="{Binding FinishSummary, UpdateSourceTrigger=PropertyChanged}" ToolTip="Resumo do atendimento (opcional)" Margin="0,0,8,0"/>
+                    <Button Content="Concluir sessão" Command="{Binding FinishCommand}" CommandParameter="completed"/>
+                    <Button Content="Abortar sessão" Command="{Binding FinishCommand}" CommandParameter="aborted"/>
+                </StackPanel>
+
+                <TextBlock Text="MÓDULOS DE DIAGNÓSTICO" Style="{StaticResource SectionTitle}" Margin="0,16,0,6"/>
+                <DataGrid ItemsSource="{Binding Modules}" MaxHeight="220">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Módulo" Binding="{Binding Name}" Width="2*"/>
+                        <DataGridTextColumn Header="Situação" Binding="{Binding StatusText}" Width="2*"/>
+                        <DataGridTextColumn Header="Estado" Binding="{Binding StateText}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ===================== Histórico ===================== -->
+    <DataTemplate DataType="{x:Type p:HistoryViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Verificar cadeia" Command="{Binding VerifyCommand}"/>
+                    <Button Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+            </DockPanel>
+            <ContentControl Grid.Row="1" ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+            <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="320" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" ToolTip="Filtrar por ação, técnico, alvo, resultado ou detalhes" Margin="0,0,8,0"/>
+                    <TextBlock Text="Carregar:" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox Width="80" ItemsSource="{Binding LimitOptions}" SelectedItem="{Binding SelectedLimit, Mode=TwoWay}" Margin="0,0,12,0"/>
+                    <TextBlock Text="{Binding CountText}" Style="{StaticResource Muted}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding ChainText}" Margin="0,6,0,0" Foreground="{Binding ChainOk, Converter={StaticResource BoolBrush}}"
+                           Visibility="{Binding ChainText, Converter={StaticResource TextVisible}}"/>
+            </StackPanel>
+            <DataGrid Grid.Row="3" Margin="0,10,0,0" ItemsSource="{Binding Operations}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Quando" Binding="{Binding When}" Width="1.2*"/>
+                    <DataGridTextColumn Header="Técnico" Binding="{Binding Technician}" Width="*"/>
+                    <DataGridTextColumn Header="Ação" Binding="{Binding Action}" Width="1.3*"/>
+                    <DataGridTextColumn Header="Alvo" Binding="{Binding Target}" Width="*"/>
+                    <DataGridTextColumn Header="Resultado" Binding="{Binding Outcome}" Width="*"/>
+                    <DataGridTextColumn Header="Detalhes" Binding="{Binding Details}" Width="2*"/>
+                    <DataGridTextColumn Header="Hash" Binding="{Binding HashShort}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DataTemplate>
+
+    <!-- ===================== Módulos ===================== -->
+    <DataTemplate DataType="{x:Type p:ModulesViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+            </DockPanel>
+            <ContentControl Grid.Row="1" ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0" IsEnabled="{Binding CanManage}">
+                <Button Content="Verificar integridade" Command="{Binding VerifyCommand}"/>
+                <Button Content="Registrar" Command="{Binding RegisterCommand}" IsEnabled="{Binding SelectedModule.CanRegister, FallbackValue=False}"/>
+                <Button Content="Ativar" Command="{Binding EnableCommand}" IsEnabled="{Binding SelectedModule.CanEnable, FallbackValue=False}"/>
+                <Button Content="Desativar" Command="{Binding DisableCommand}" IsEnabled="{Binding SelectedModule.CanDisable, FallbackValue=False}"/>
+            </StackPanel>
+            <DataGrid Grid.Row="3" Margin="0,10,0,0" ItemsSource="{Binding Modules}" SelectedItem="{Binding SelectedModule, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Módulo" Binding="{Binding Name}" Width="2*"/>
+                    <DataGridTextColumn Header="Identificador" Binding="{Binding Id}" Width="2*"/>
+                    <DataGridTextColumn Header="Versão" Binding="{Binding Version}" Width="*"/>
+                    <DataGridTextColumn Header="Publicador" Binding="{Binding Publisher}" Width="*"/>
+                    <DataGridTextColumn Header="Situação" Binding="{Binding StatusText}" Width="2*"/>
+                    <DataGridTextColumn Header="Estado" Binding="{Binding StateText}" Width="1.5*"/>
+                    <DataGridTextColumn Header="Integridade" Binding="{Binding IntegrityText}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Grid.Row="4" Margin="0,10,0,0">
+                <TextBlock Text="{Binding SelectedModule.Problems}" Foreground="{DynamicResource CritBrush}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Message}" Style="{StaticResource Muted}"
+                           Visibility="{Binding Message, Converter={StaticResource TextVisible}}"/>
+                <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0"
+                           Text="Módulos 'Planejados' ainda não existem: aparecem aqui apenas para mostrar o roteiro. Módulos disponíveis só carregam se registrados por um administrador e com integridade verificada."/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+    <!-- ===================== Backups ===================== -->
+    <DataTemplate DataType="{x:Type p:BackupsViewModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Atualizar" Command="{Binding RefreshCommand}" Margin="0"/>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+            </DockPanel>
+            <ContentControl Grid.Row="1" ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="Criar backup agora" Command="{Binding CreateCommand}" IsEnabled="{Binding CanManage}" Style="{StaticResource PrimaryButton}"/>
+                <Button Content="Verificar selecionado" Command="{Binding VerifyCommand}" IsEnabled="{Binding CanManage}"/>
+                <Button Content="Restaurar selecionado…" Command="{Binding RestoreCommand}" IsEnabled="{Binding CanRestore}"/>
+            </StackPanel>
+            <DataGrid Grid.Row="3" Margin="0,10,0,0" ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Arquivo" Binding="{Binding Name}" Width="3*"/>
+                    <DataGridTextColumn Header="Criado em" Binding="{Binding Modified}" Width="*"/>
+                    <DataGridTextColumn Header="Tamanho" Binding="{Binding SizeText}" Width="*"/>
+                    <DataGridTextColumn Header="Checksum" Binding="{Binding ChecksumText}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Grid.Row="4" Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,10,0,0"
+                       Visibility="{Binding Message, Converter={StaticResource TextVisible}}"/>
+        </Grid>
+    </DataTemplate>
+
+    <!-- ===================== Segurança ===================== -->
+    <DataTemplate DataType="{x:Type p:SecurityViewModel}">
+        <v:SecurityView/>
+    </DataTemplate>
+
+    <!-- ===================== Configurações ===================== -->
+    <DataTemplate DataType="{x:Type p:SettingsViewModel}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="640" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Heading}"/>
+                <ContentControl ContentTemplate="{StaticResource PageStatus}" Content="{Binding}"/>
+
+                <Border Style="{StaticResource Card}" Margin="0,12,0,0" IsEnabled="{Binding CanWrite}">
+                    <StackPanel>
+                        <TextBlock Text="PREFERÊNCIAS" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="Tema" Style="{StaticResource Muted}"/>
+                        <ComboBox ItemsSource="{Binding ThemeOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                  SelectedValue="{Binding SelectedTheme, Mode=TwoWay}" Margin="0,4,0,10"/>
+                        <TextBlock Text="Backups automáticos mantidos (1 a 200)" Style="{StaticResource Muted}"/>
+                        <TextBox Text="{Binding BackupKeepText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,10" Width="120" HorizontalAlignment="Left"/>
+                        <TextBlock Text="Nível de log" Style="{StaticResource Muted}"/>
+                        <ComboBox ItemsSource="{Binding LogLevelOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                  SelectedValue="{Binding SelectedLogLevel, Mode=TwoWay}" Margin="0,4,0,12"/>
+                        <Button Content="Salvar" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}" Margin="0" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="{Binding Message}" Style="{StaticResource Muted}" Margin="0,8,0,0"
+                           Visibility="{Binding Message, Converter={StaticResource TextVisible}}"/>
+
+                <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SOMENTE LEITURA" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{Binding CoreText}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding ModeText, StringFormat='Modo: {0}'}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding PublishersText, StringFormat='Publicadores de módulos confiáveis: {0}'}" TextWrapping="Wrap"/>
+                        <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,8,0,0"
+                                   Text="Sincronização online e licenciamento ainda não foram implementados (etapa 8 do roteiro)."/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+</ResourceDictionary>

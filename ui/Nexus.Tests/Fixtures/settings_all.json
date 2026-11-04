@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": 15,
+  "result": {
+    "ui.theme": "dark",
+    "ui.language": "pt-BR",
+    "mode": "local",
+    "log.level": "INFO",
+    "backup.keep": 10,
+    "modules.trusted_publishers": [
+      "LMF Informática"
+    ]
+  }
+}
