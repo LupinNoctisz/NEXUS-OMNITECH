@@ -192,7 +192,7 @@ def test_migration_v1_to_v2_preserves_data_and_flags_legacy_accounts(tmp_path):
     (home).mkdir()
     make_v1_database(home / "nexus.db")
     with NexusCore(home=home, module_dirs=[tmp_path / "m"]) as core:
-        assert core.db.schema_version == SCHEMA_VERSION == 2
+        assert core.db.schema_version == SCHEMA_VERSION == 3
         assert core.technicians.get("legado")["has_password"] is False
         assert core.db.query_one("SELECT COUNT(*) AS n FROM devices")["n"] == 1
         with pytest.raises(AuthenticationError):

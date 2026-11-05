@@ -53,7 +53,7 @@ A interface (WPF) inicia o núcleo como **processo filho**: `python -m nexus --h
 | `sessions.start` | sim | `device_id`, `kind?` | `{id}` |
 | `sessions.finish` | sim | `id`, `status?`, `summary?` | `{ok}` |
 | `audit.list` | sim | `limit?`, `session_id?` | lista |
-| `audit.verify` | sim | – | `{ok, records, first_bad_id}` |
+| `audit.verify` | sim | – | `{ok, records, first_bad_id, scope}` (`scope`: `full`; a conferência completa percorre a cadeia em lotes) |
 | `modules.list` | sim | – | estado real de cada módulo |
 | `modules.verify` | sim | `id` | `{ok, problems}` |
 | `modules.register` | sim | `id`, `confirmed` | `{ok}` |

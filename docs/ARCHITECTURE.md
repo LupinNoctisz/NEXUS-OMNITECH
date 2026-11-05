@@ -39,3 +39,9 @@ Dados de diagnóstico/medições entram nas etapas dos respectivos módulos, via
 ## Identidade
 Autenticação por senha individual (scrypt) em `core/auth.py`. O ator do núcleo é somente leitura e só muda por `login()`/`logout()`.
 Na UI, o login acontece por `auth.login` e vale para aquele processo do núcleo. Detalhes e limites em [SECURITY.md](SECURITY.md).
+
+## Estabilidade (Fase 2)
+
+- **Esquema v3**: índices parciais/compostos em `sessions` (abertas) e `devices` (conexão, último contato), para que o painel não varra tabelas inteiras.
+- **Backup automático antes de migrar**: se o banco existente é de esquema mais antigo, uma cópia verificada (`*-pre-migration-vN.db` + `.sha256`) é criada antes; banco mais novo que o NEXUS é recusado sem alteração.
+- **Verificação da auditoria**: em lotes (memória constante). O painel inicial usa conferência *incremental* (só registros novos) e refaz a conferência **completa** no máximo a cada 5 min; a tela Segurança e `audit.verify` sempre conferem tudo. Limitação conhecida: adulteração de registro antigo pode levar até 5 min para aparecer no painel inicial. A primeira chamada após iniciar o núcleo ou restaurar um backup é completa.

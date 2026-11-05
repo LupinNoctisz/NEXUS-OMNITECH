@@ -14,7 +14,7 @@ from nexus.core.safety import DestructiveRequest
 
 # --- banco / auditoria ------------------------------------------------------
 def test_schema_migrated(core):
-    assert core.db.schema_version == 2  # v2 = autenticação por senha
+    assert core.db.schema_version == 3  # v2 = senhas; v3 = índices
     assert core.db.integrity_check()
 
 
@@ -228,7 +228,13 @@ def test_status_reports_real_state(core):
     assert status["audit"]["ok"] is True
     assert any("backup" in a["message"].lower() for a in status["alerts"])
     core.db.execute("UPDATE operations SET outcome = 'x' WHERE id = 1")
-    assert any(a["level"] == "critical" for a in core.status()["alerts"])
+    assert core.security_overview()["audit"]["ok"] is False  # conferência completa
+    from nexus.core import audit as audit_mod
+    audit_mod.FULL_RESCAN_SECONDS = 0  # força a conferência completa também no painel
+    try:
+        assert any(a["level"] == "critical" for a in core.status()["alerts"])
+    finally:
+        audit_mod.FULL_RESCAN_SECONDS = 300.0
 
 
 def test_default_home_uses_localappdata_on_windows(monkeypatch, tmp_path):

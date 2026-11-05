@@ -84,6 +84,14 @@ MIGRATIONS: list[tuple[int, str]] = [
         ALTER TABLE technicians ADD COLUMN locked_until TEXT;
         """,
     ),
+    (
+        3,
+        """
+        CREATE INDEX idx_sessions_open ON sessions(id) WHERE status = 'open';
+        CREATE INDEX idx_devices_connection ON devices(connection, last_seen);
+        CREATE INDEX idx_devices_last_seen ON devices(last_seen);
+        """,
+    ),
 ]
 
 SCHEMA_VERSION = MIGRATIONS[-1][0]

@@ -4,6 +4,7 @@
   "result": {
     "ok": true,
     "records": 13,
-    "first_bad_id": null
+    "first_bad_id": null,
+    "scope": "full"
   }
 }

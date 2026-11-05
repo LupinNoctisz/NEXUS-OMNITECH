@@ -4,7 +4,7 @@
   "result": {
     "protocol": "1.0",
     "core_version": "0.1.0",
-    "schema_version": 2,
+    "schema_version": 3,
     "methods": [
       "audit.list",
       "audit.verify",

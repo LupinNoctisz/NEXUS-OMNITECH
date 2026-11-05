@@ -146,7 +146,7 @@ def _audit_list(core: NexusCore, limit: int, session_id: int | None) -> list[dic
 def _audit_verify(core: NexusCore) -> dict[str, Any]:
     core.require(Permission.AUDIT_READ)
     result = core.audit.verify()
-    return {"ok": result.ok, "records": result.records, "first_bad_id": result.first_bad_id}
+    return {"ok": result.ok, "records": result.records, "first_bad_id": result.first_bad_id, "scope": result.scope}
 
 
 def _module_verify(core: NexusCore, module_id: str) -> dict[str, Any]:

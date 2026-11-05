@@ -20,7 +20,8 @@
     "audit": {
       "ok": true,
       "records": 12,
-      "first_bad_id": null
+      "first_bad_id": null,
+      "scope": "full"
     },
     "database_integrity": true,
     "technicians": {

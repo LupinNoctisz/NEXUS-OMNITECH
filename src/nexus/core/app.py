@@ -122,14 +122,15 @@ class NexusCore:
 
     # -- segurança e painel inicial -----------------------------------------
     def security_overview(self) -> dict[str, Any]:
-        verification = self.audit.verify()
+        verification = self.audit.verify()  # tela Segurança: sempre a conferência completa
         technicians = self.technicians.list()
         now = datetime.now(timezone.utc)
         return {
             "actor": self._actor,
             "role": str(self.role),
             "permissions": sorted(str(p) for p in ROLE_PERMISSIONS[self.role]),
-            "audit": {"ok": verification.ok, "records": verification.records, "first_bad_id": verification.first_bad_id},
+            "audit": {"ok": verification.ok, "records": verification.records, "first_bad_id": verification.first_bad_id,
+                      "scope": verification.scope},
             "database_integrity": self.db.integrity_check(),
             "technicians": {
                 "total": len(technicians),
@@ -144,7 +145,7 @@ class NexusCore:
         }
 
     def status(self) -> dict[str, Any]:
-        verification = self.audit.verify()
+        verification = self.audit.verify_incremental()
         modules = self.modules.status()
         sessions_open = self.sessions.open_sessions()
         technicians = self.technicians.list()
@@ -190,7 +191,7 @@ class NexusCore:
                         "latest_utc": (datetime.fromtimestamp(backups[0].stat().st_mtime, timezone.utc)
                                        .isoformat(timespec="seconds") if backups else None)},
             "sync": {"state": "not_configured", "detail": "Sincronização online será implementada na etapa 8."},
-            "audit": {"ok": verification.ok, "records": verification.records},
+            "audit": {"ok": verification.ok, "records": verification.records, "scope": verification.scope},
             "alerts": alerts,
         }
 
