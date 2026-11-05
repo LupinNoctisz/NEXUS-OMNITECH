@@ -7,7 +7,7 @@
       "name": "leitor.demo",
       "role": "viewer",
       "active": true,
-      "created_at": "2026-11-05T20:47:32+00:00",
+      "created_at": "2026-11-05T20:55:55+00:00",
       "failed_attempts": 0,
       "locked_until": null,
       "has_password": true
@@ -17,7 +17,7 @@
       "name": "tecnico.demo",
       "role": "admin",
       "active": true,
-      "created_at": "2026-11-05T20:47:32+00:00",
+      "created_at": "2026-11-05T20:55:55+00:00",
       "failed_attempts": 0,
       "locked_until": null,
       "has_password": true

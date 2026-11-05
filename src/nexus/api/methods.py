@@ -155,5 +155,6 @@ def _module_verify(core: NexusCore, module_id: str) -> dict[str, Any]:
 
 
 def _restore(core: NexusCore, name: str, confirmed: bool) -> dict[str, Any]:
+    core.require(Permission.BACKUP_RESTORE)  # antes de olhar o nome: sem permissão, nada é revelado nem tentado
     safety_copy = core.backups.restore(core.backups.path_for(name), confirmed=confirmed)
     return {"safety_backup": safety_copy.name, "session_active": core.actor != ANONYMOUS}

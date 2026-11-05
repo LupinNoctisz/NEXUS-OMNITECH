@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .database import SCHEMA_VERSION
 from .errors import BackupError, ConfirmationRequired
 from .permissions import Permission
 from .util import sha256_file
@@ -23,12 +24,16 @@ def _check_sqlite_file(path: Path) -> None:
         conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
         try:
             result = conn.execute("PRAGMA integrity_check").fetchone()
+            version = conn.execute("PRAGMA user_version").fetchone()[0]
         finally:
             conn.close()
     except sqlite3.DatabaseError as exc:
         raise BackupError(f"Arquivo de backup inválido: {exc}") from exc
     if not result or result[0] != "ok":
         raise BackupError("O backup falhou na verificação de integridade do SQLite.")
+    if version > SCHEMA_VERSION:
+        raise BackupError(f"Este backup é de uma versão mais nova do esquema ({version}) que a suportada por este NEXUS "
+                          f"({SCHEMA_VERSION}). Atualize o NEXUS; nada foi alterado.")
 
 
 class BackupManager:

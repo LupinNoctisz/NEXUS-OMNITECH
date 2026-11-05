@@ -122,3 +122,67 @@ def test_status_does_full_rescan_after_interval(big, monkeypatch):
     monkeypatch.setattr(audit_mod, "FULL_RESCAN_SECONDS", 0.0)
     assert not big.status()["audit"]["ok"]                   # intervalo vencido: pega a adulteração
     assert not big.security_overview()["audit"]["ok"]        # a tela Segurança sempre confere tudo
+
+
+# --- restauração de backup: casos de falha não podem estragar o banco em uso ----------------------
+def _snapshot(core):
+    return core.technicians.count(), core.audit.verify().records
+
+
+def test_restore_of_tampered_backup_leaves_database_untouched(core):
+    path = core.backups.create("x")
+    with path.open("ab") as handle:
+        handle.write(b"lixo")
+    core.add_technician("ana", "technician", PASSWORD)
+    before = _snapshot(core)
+    from nexus.core import BackupError
+    with pytest.raises(BackupError):
+        core.backups.restore(path, confirmed=True)
+    assert _snapshot(core) == before
+
+
+def test_restore_of_newer_schema_backup_is_refused_and_keeps_current_data(core):
+    import sqlite3
+    from nexus.core import BackupError as NexusError
+    path = core.backups.create("x")
+    (path.with_name(path.name + ".sha256")).unlink()          # simula backup sem checksum
+    conn = sqlite3.connect(path)
+    conn.execute("PRAGMA user_version = 99")
+    conn.commit()
+    conn.close()
+    core.add_technician("ana", "technician", PASSWORD)
+    before = _snapshot(core)
+    with pytest.raises(NexusError):
+        core.backups.restore(path, confirmed=True)
+    assert core.db.schema_version == 3
+    assert _snapshot(core) == before
+    assert core.technicians.get("ana") is not None
+
+
+# --- matriz de permissões por RPC (travada: mudar exige decisão consciente) ---------------------------
+_MUTATING = {
+    "devices.scan": "devices.manage", "backups.create": "backup.manage", "backups.restore": "backup.restore",
+    "modules.register": "modules.manage", "modules.enable": "modules.manage", "modules.disable": "modules.manage",
+    "settings.set": "settings.write", "technicians.add": "technicians.manage",
+    "technicians.set_active": "technicians.manage", "sessions.start": "sessions.run",
+}
+
+
+@pytest.mark.parametrize("role", ["viewer", "technician", "admin"])
+def test_rpc_permission_matrix_for_mutating_methods(core, login_as, role):
+    import json
+    from nexus.api.server import RpcServer
+    from nexus.core.permissions import ROLE_PERMISSIONS, Role
+
+    login_as("u-" + role, role) if role != "admin" else login_as("admin")
+    server = RpcServer(core)
+    params = {"backups.restore": {"name": "x", "confirmed": True}, "settings.set": {"key": "ui.theme", "value": "dark"},
+              "technicians.add": {"name": "zz", "role": "viewer", "password": PASSWORD},
+              "technicians.set_active": {"name": "admin", "active": True}, "sessions.start": {"device_id": 1},
+              "modules.register": {"id": "x"}, "modules.enable": {"id": "x"}, "modules.disable": {"id": "x"}}
+    for method, permission in _MUTATING.items():
+        raw = server.handle(json.dumps({"jsonrpc": "2.0", "id": 1, "method": method,
+                                        "params": params.get(method, {})}).encode())
+        error = json.loads(raw).get("error")
+        allowed = any(str(p) == permission for p in ROLE_PERMISSIONS[Role(role)])
+        assert (error is not None and error["code"] == -32001) == (not allowed), (role, method, error)

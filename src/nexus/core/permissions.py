@@ -1,9 +1,9 @@
 """Papéis e permissões.
 
-Nesta etapa a identidade do técnico é DECLARATIVA (nome informado ao abrir o
-núcleo). Autenticação real (senha/licença) entra na etapa de licenciamento; até
-lá, o sistema de permissões protege contra erro operacional, não contra um
-usuário local malicioso com acesso ao banco de dados.
+O técnico é identificado por nome e senha (scrypt, ver ``auth``). As permissões são aplicadas no núcleo
+(``NexusCore.require``), nunca pela interface: o papel decide o que cada chamada pode fazer.
+Observação: quem tem acesso direto ao arquivo do banco no disco pode contorná-las; a proteção é contra
+erro operacional e uso indevido pela interface, não contra o dono da máquina.
 """
 
 from __future__ import annotations

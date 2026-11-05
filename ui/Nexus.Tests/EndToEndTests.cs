@@ -112,6 +112,49 @@ public class EndToEndTests
     }
 
     [Fact]
+    public async Task Real_core_restore_without_the_technician_ends_the_session_cleanly()
+    {
+        var options = TryOptions();
+        if (options is null) return;
+
+        var home = Path.Combine(Path.GetTempPath(), "nexus-e2e-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(home);
+        try
+        {
+            InitAdmin(options, home);
+
+            await using var transport = ProcessTransport.Start(options with { HomePath = home });
+            await using var connection = new JsonRpcConnection(transport, TimeSpan.FromSeconds(60));
+            connection.Start();
+            var api = new CoreApi(connection);
+
+            await api.LoginAsync(Admin, Password);
+            var backup = await api.CreateBackupAsync("e2e"); // este backup NÃO contém o técnico criado abaixo
+            await api.AddTechnicianAsync("novo.admin", "admin", Password);
+            await api.LogoutAsync();
+            await api.LoginAsync("novo.admin", Password);
+
+            var restored = await api.RestoreBackupAsync(backup, true);
+            Assert.False(restored.SessionActive);
+            Assert.EndsWith(".db", restored.SafetyBackup);
+
+            var after = await Assert.ThrowsAsync<RpcException>(() => api.GetStatusAsync());
+            Assert.Equal(RpcCodes.NotAuthenticated, after.Code);
+
+            // o núcleo continua de pé: o administrador original volta a entrar e vê a cópia de segurança
+            await api.LoginAsync(Admin, Password);
+            Assert.Contains(await api.ListBackupsAsync(), b => b.Name == restored.SafetyBackup);
+            var technicians = await api.ListTechniciansAsync();
+            Assert.DoesNotContain(technicians, t => t.Name == "novo.admin");
+            Assert.True((await api.GetStatusAsync()).Audit.Ok);
+        }
+        finally
+        {
+            try { Directory.Delete(home, recursive: true); } catch (IOException) { }
+        }
+    }
+
+    [Fact]
     public async Task Missing_python_is_reported_as_unavailable_not_as_a_crash()
     {
         var options = new CoreLaunchOptions("python-que-nao-existe-xyz", Path.GetTempPath(), null);
