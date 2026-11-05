@@ -1,0 +1,54 @@
+name: Instalador em rascunho de Release
+
+# Manual. Gera o instalador, testa (instala/abre/atualiza/desinstala) e o anexa a um RASCUNHO de Release:
+# rascunhos só são visíveis para quem tem acesso de escrita ao repositório. Publicar é uma decisão manual e posterior.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão (deve ser igual à de pyproject.toml / Nexus.App.csproj)"
+        default: "0.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  draft:
+    runs-on: windows-latest
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Conferir versões
+        run: python scripts/check_versions.py
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --no-progress -y
+          }
+      - name: Gerar o instalador
+        shell: pwsh
+        run: ./installer/build.ps1 -Version ${{ inputs.version }}
+      - name: Testar o instalador (instalar, abrir, atualizar, desinstalar)
+        shell: pwsh
+        run: ./installer/test-installer.ps1 -Version ${{ inputs.version }} -NewVersion 9.9.9
+      - name: Criar rascunho de Release com o instalador
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ inputs.version }}"
+          $exe = "build/installer/NexusOmnitech-Setup-$v.exe"
+          gh release create "v$v-rascunho" $exe "$exe.sha256" --draft --prerelease `
+            --title "NEXUS OMNITECH $v (rascunho para teste)" `
+            --notes "Instalador de TESTE, sem assinatura digital (o SmartScreen pode avisar). Gerado e testado pelo CI. Confira o SHA-256 do arquivo .sha256."
