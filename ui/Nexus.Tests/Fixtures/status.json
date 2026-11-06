@@ -2,7 +2,7 @@
   "jsonrpc": "2.0",
   "id": 6,
   "result": {
-    "version": "0.1.0",
+    "version": "0.1.1",
     "schema_version": 3,
     "expected_schema_version": 3,
     "mode": "local",
@@ -19,8 +19,8 @@
         "serial": "DEMO0001",
         "label": null,
         "connection": "connected",
-        "first_seen": "2026-11-05T21:05:46+00:00",
-        "last_seen": "2026-11-05T21:05:46+00:00",
+        "first_seen": "2026-11-06T12:27:37+00:00",
+        "last_seen": "2026-11-06T12:27:37+00:00",
         "properties": {
           "vendor_id": "18d1",
           "product_id": "4ee7",
@@ -35,7 +35,7 @@
         "kind": "general",
         "technician": "tecnico.demo",
         "status": "open",
-        "started_at": "2026-11-05T21:05:46+00:00",
+        "started_at": "2026-11-06T12:27:37+00:00",
         "ended_at": null,
         "summary": null,
         "device_label": null,
@@ -47,8 +47,8 @@
         "kind": "pc_diagnostics",
         "technician": "tecnico.demo",
         "status": "completed",
-        "started_at": "2026-11-05T21:05:46+00:00",
-        "ended_at": "2026-11-05T21:05:46+00:00",
+        "started_at": "2026-11-06T12:27:37+00:00",
+        "ended_at": "2026-11-06T12:27:37+00:00",
         "summary": "Sessão de demonstração",
         "device_label": "Cliente Demo A",
         "device_model": "Notebook Demo"
@@ -57,63 +57,63 @@
     "recent_operations": [
       {
         "id": 12,
-        "ts": "2026-11-05T21:05:46+00:00",
+        "ts": "2026-11-06T12:27:37+00:00",
         "technician": "tecnico.demo",
         "action": "auth.login",
         "target": null,
         "session_id": null,
         "details": "{}",
         "outcome": "ok",
-        "prev_hash": "d01dbb02ccb7af0efd04faab2afeb5baee8dfca013fea31d3239e0eac075d31b",
-        "hash": "a67a50eeadb6020df2eba50a5011ad053b647225aa919d2848c06b3f978f4737"
+        "prev_hash": "f2365f3aab14d379f1fd8cf53b48d4722d1dfb90508a16ff0685ab7e57f375b9",
+        "hash": "929c786d401f91f809b58a24e53a0dbe8b683eceb976e112c8b680b546cd18f1"
       },
       {
         "id": 11,
-        "ts": "2026-11-05T21:05:46+00:00",
+        "ts": "2026-11-06T12:27:37+00:00",
         "technician": "tecnico.demo",
         "action": "auth.logout",
         "target": null,
         "session_id": null,
         "details": "{}",
         "outcome": "ok",
-        "prev_hash": "e22356fb9591a6ff43da9b52009b46fdc04e6b6b6ad5e97d7bc833b9d7aa1e2b",
-        "hash": "d01dbb02ccb7af0efd04faab2afeb5baee8dfca013fea31d3239e0eac075d31b"
+        "prev_hash": "ae68a9c9d9a63c12ba21701f560cd8d9826c9f5c64a66dc0d23d04e2a8c27ee9",
+        "hash": "f2365f3aab14d379f1fd8cf53b48d4722d1dfb90508a16ff0685ab7e57f375b9"
       },
       {
         "id": 10,
-        "ts": "2026-11-05T21:05:46+00:00",
+        "ts": "2026-11-06T12:27:37+00:00",
         "technician": "tecnico.demo",
         "action": "backup.create",
-        "target": "nexus-20261105-210546-demo.db",
+        "target": "nexus-20261106-122737-demo.db",
         "session_id": null,
-        "details": "{\"reason\":\"demo\",\"sha256\":\"71b4b016eaca6709a0b4b6749f38fb3693ce0926784460fabe52809405dae8c0\"}",
+        "details": "{\"reason\":\"demo\",\"sha256\":\"6ed0952d7d2bfa7db0b3d693dc4ef20f521f5e5eaccad1f264e8a784709b337a\"}",
         "outcome": "ok",
-        "prev_hash": "e3b676f0828979f99856abd89aac7a874148225962200270f39eef4385228c4a",
-        "hash": "e22356fb9591a6ff43da9b52009b46fdc04e6b6b6ad5e97d7bc833b9d7aa1e2b"
+        "prev_hash": "11ee6d97918cc50939926926362fe5973c3e70c1b03146517c9cd444bef664b3",
+        "hash": "ae68a9c9d9a63c12ba21701f560cd8d9826c9f5c64a66dc0d23d04e2a8c27ee9"
       },
       {
         "id": 9,
-        "ts": "2026-11-05T21:05:46+00:00",
+        "ts": "2026-11-06T12:27:37+00:00",
         "technician": "tecnico.demo",
         "action": "module.enable",
         "target": "nexus.demo",
         "session_id": null,
         "details": "{}",
         "outcome": "ok",
-        "prev_hash": "eac81b38f46a22dac13021bc499930765934a0e4f5267f7713d541c9974b9509",
-        "hash": "e3b676f0828979f99856abd89aac7a874148225962200270f39eef4385228c4a"
+        "prev_hash": "a2af57be4edb91c4d6a23f5317cb1c9092551b80c59e58d8435e1100dcb0d993",
+        "hash": "11ee6d97918cc50939926926362fe5973c3e70c1b03146517c9cd444bef664b3"
       },
       {
         "id": 8,
-        "ts": "2026-11-05T21:05:46+00:00",
+        "ts": "2026-11-06T12:27:37+00:00",
         "technician": "tecnico.demo",
         "action": "module.register",
         "target": "nexus.demo",
         "session_id": null,
         "details": "{\"manifest_sha256\":\"9a430708e4ee147230a061a68ddcd1d92dde418b7a00ac3ebd77f2cbd590057b\",\"reregistered\":false,\"version\":\"1.0.0\"}",
         "outcome": "ok",
-        "prev_hash": "ba43a1dec1357b3b4ba1ea40c22bca539876385206f1c3245c6237927e7bf8ae",
-        "hash": "eac81b38f46a22dac13021bc499930765934a0e4f5267f7713d541c9974b9509"
+        "prev_hash": "39501837824772933b7bd2cdc97ddcc4ac28a27bac343ee2b8fbb301da739887",
+        "hash": "a2af57be4edb91c4d6a23f5317cb1c9092551b80c59e58d8435e1100dcb0d993"
       }
     ],
     "modules": [
@@ -192,8 +192,8 @@
     ],
     "backups": {
       "count": 1,
-      "latest": "nexus-20261105-210546-demo.db",
-      "latest_utc": "2026-11-05T21:05:46+00:00"
+      "latest": "nexus-20261106-122737-demo.db",
+      "latest_utc": "2026-11-06T12:27:37+00:00"
     },
     "sync": {
       "state": "not_configured",

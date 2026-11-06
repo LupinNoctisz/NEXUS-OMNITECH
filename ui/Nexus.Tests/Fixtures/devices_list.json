@@ -4,7 +4,7 @@
   "result": [
     {
       "id": 2,
-      "uid": "manual:a5fc9ea25da0",
+      "uid": "manual:a937f792ad6f",
       "kind": "pc",
       "source": "manual",
       "vendor": "Demo",
@@ -12,8 +12,8 @@
       "serial": null,
       "label": "Cliente Demo A",
       "connection": "unknown",
-      "first_seen": "2026-11-05T21:05:46+00:00",
-      "last_seen": "2026-11-05T21:05:46+00:00",
+      "first_seen": "2026-11-06T12:27:37+00:00",
+      "last_seen": "2026-11-06T12:27:37+00:00",
       "properties": {}
     },
     {
@@ -26,8 +26,8 @@
       "serial": "DEMO0001",
       "label": null,
       "connection": "connected",
-      "first_seen": "2026-11-05T21:05:46+00:00",
-      "last_seen": "2026-11-05T21:05:46+00:00",
+      "first_seen": "2026-11-06T12:27:37+00:00",
+      "last_seen": "2026-11-06T12:27:37+00:00",
       "properties": {
         "vendor_id": "18d1",
         "product_id": "4ee7",

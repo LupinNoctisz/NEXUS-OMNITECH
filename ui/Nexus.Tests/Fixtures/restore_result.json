@@ -2,7 +2,7 @@
   "jsonrpc": "2.0",
   "id": 20,
   "result": {
-    "safety_backup": "nexus-20261105-210546-pre-restore.db",
+    "safety_backup": "nexus-20261106-122737-pre-restore.db",
     "session_active": true
   }
 }

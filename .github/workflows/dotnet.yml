@@ -67,16 +67,16 @@ jobs:
           }
       - name: Gerar o instalador
         shell: pwsh
-        run: ./installer/build.ps1 -Version 0.1.0
+        run: ./installer/build.ps1 -Version 0.1.1
       - name: Testar o instalador (instalar, abrir, atualizar, desinstalar)
         shell: pwsh
-        run: ./installer/test-installer.ps1 -Version 0.1.0 -NewVersion 0.1.1
+        run: ./installer/test-installer.ps1 -Version 0.1.1 -NewVersion 0.1.2
       - name: Publicar instalador como artefato do CI (não é uma release)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: NexusOmnitech-Setup-0.1.0
+          name: NexusOmnitech-Setup-0.1.1
           path: |
-            build/installer/NexusOmnitech-Setup-0.1.0.exe
-            build/installer/NexusOmnitech-Setup-0.1.0.exe.sha256
+            build/installer/NexusOmnitech-Setup-0.1.1.exe
+            build/installer/NexusOmnitech-Setup-0.1.1.exe.sha256
           if-no-files-found: error

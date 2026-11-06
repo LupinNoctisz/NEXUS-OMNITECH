@@ -4,11 +4,11 @@
   abre a janela, confere instância única, fecha e confere que o núcleo Python encerrou, atualiza para uma versão
   nova preservando os dados e desinstala. Falha (exit != 0) no primeiro problema.
 .EXAMPLE
-  ./installer/test-installer.ps1 -Version 0.1.0 -NewVersion 0.1.1
+  ./installer/test-installer.ps1 -Version 0.1.1 -NewVersion 0.1.2
 #>
 param(
-    [string]$Version = "0.1.0",
-    [string]$NewVersion = "0.1.1"
+    [string]$Version = "0.1.1",
+    [string]$NewVersion = "0.1.2"
 )
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
