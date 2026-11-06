@@ -10,13 +10,6 @@ public partial class SecurityView : UserControl
 
     private SecurityViewModel? Vm => DataContext as SecurityViewModel;
 
-    private async void ChangePassword_Click(object sender, RoutedEventArgs e)
-    {
-        if (Vm is null) return;
-        var ok = await Vm.ChangePasswordAsync(OldBox.Password, NewBox.Password, NewConfirmBox.Password);
-        if (ok) Clear(OldBox, NewBox, NewConfirmBox);
-    }
-
     private async void AddTechnician_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is null) return;

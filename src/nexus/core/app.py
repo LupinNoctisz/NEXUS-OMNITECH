@@ -154,7 +154,7 @@ class NexusCore:
         if not technicians:
             alerts.append({"level": "info", "message": "Nenhum técnico cadastrado. Execute 'nexus init --admin NOME'."})
         missing_pw = [t["name"] for t in technicians if t["active"] and not t["has_password"]]
-        if missing_pw:
+        if missing_pw and (self._actor == ANONYMOUS or self.can(Permission.TECHNICIANS_MANAGE)):  # só admin (ou uso local sem login)
             alerts.append({"level": "warning", "message": "Técnicos ativos sem senha (não conseguem entrar): " + ", ".join(missing_pw)})
         if not verification.ok:
             alerts.append({"level": "critical", "message": f"Histórico adulterado a partir do registro {verification.first_bad_id}."})

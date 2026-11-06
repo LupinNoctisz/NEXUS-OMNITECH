@@ -33,6 +33,8 @@ class Permission(StrEnum):
     BACKUP_MANAGE = "backup.manage"
     BACKUP_RESTORE = "backup.restore"
     TECHNICIANS_MANAGE = "technicians.manage"
+    SECURITY_READ = "security.read"
+    SETTINGS_READ = "settings.read"
 
 
 _VIEWER = {Permission.DEVICES_READ, Permission.AUDIT_READ}

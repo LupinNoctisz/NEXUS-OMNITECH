@@ -32,7 +32,6 @@ public sealed partial class SecurityViewModel : PageViewModel
     [ObservableProperty] private string _publishersText = "—";
     [ObservableProperty] private string _newTechnicianName = "";
     [ObservableProperty] private string _newTechnicianRole = "technician";
-    [ObservableProperty] private string? _passwordMessage;
     [ObservableProperty] private string? _technicianMessage;
 
     protected override async Task LoadCoreAsync()
@@ -64,22 +63,6 @@ public sealed partial class SecurityViewModel : PageViewModel
 
         Technicians.Clear();
         foreach (var technician in technicians) Technicians.Add(new TechnicianRow(technician));
-    }
-
-    /// <summary>Chamado pela view com os textos dos PasswordBox (as senhas não ficam guardadas no ViewModel).</summary>
-    public async Task<bool> ChangePasswordAsync(string oldPassword, string newPassword, string confirmation)
-    {
-        PasswordMessage = null;
-        if (newPassword != confirmation)
-        {
-            ErrorMessage = "A confirmação não confere com a nova senha.";
-            return false;
-        }
-        return await RunAsync(async () =>
-        {
-            await Api.ChangePasswordAsync(oldPassword, newPassword);
-            PasswordMessage = "Senha alterada.";
-        });
     }
 
     public async Task<bool> AddTechnicianAsync(string password, string confirmation)

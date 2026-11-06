@@ -72,7 +72,7 @@ public sealed record Option(string Value, string Label);
 
 public sealed record KeyValueRow(string Key, string Value);
 
-public sealed record NavItem(string Key, string Title, string Glyph, Func<PageViewModel> Create);
+public sealed record NavItem(string Key, string Title, string Glyph, Func<PageViewModel> Create, string? Requires = null);
 
 /// <summary>Datas do núcleo vêm em UTC (ISO 8601); a interface mostra no horário local.</summary>
 public static class TimeText

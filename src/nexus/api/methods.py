@@ -68,11 +68,12 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
 
     # --- painel e segurança -------------------------------------------------------------
     add("status.get", lambda c, p: c.status(), description="Painel inicial (dados reais do núcleo).")
-    add("security.overview", lambda c, p: c.security_overview())
-    add("system.paths", lambda c, p: {
+    add("security.overview", lambda c, p: (c.require(Permission.SECURITY_READ), c.security_overview())[1],
+        description="Somente administrador.")
+    add("system.paths", lambda c, p: (c.require(Permission.SETTINGS_READ), {
         "home": str(c.paths.home), "database": str(c.paths.db), "logs": str(c.paths.logs),
-        "backups": str(c.paths.backups), "modules": str(c.paths.modules)},
-        description="Onde o NEXUS guarda dados, logs, backups e módulos instalados.")
+        "backups": str(c.paths.backups), "modules": str(c.paths.modules)})[1],
+        description="Somente administrador. Onde o NEXUS guarda dados, logs, backups e módulos instalados.")
 
     # --- dispositivos ---------------------------------------------------------------------
     add("devices.list", lambda c, p: c.devices.list(p["connection"]),
@@ -118,10 +119,12 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
         {"name": Param("str", max_len=100), "confirmed": Param("bool", False, default=False)})
 
     # --- configurações e técnicos --------------------------------------------------------------------------------
-    add("settings.get_all", lambda c, p: c.settings.all())
+    add("settings.get_all", lambda c, p: (c.require(Permission.SETTINGS_READ), c.settings.all())[1],
+        description="Somente administrador.")
     add("settings.set", lambda c, p: (c.set_setting(p["key"], p["value"]), {"ok": True})[1],
         {"key": Param("str", max_len=100), "value": Param("any")})
-    add("technicians.list", lambda c, p: c.technicians.list())
+    add("technicians.list", lambda c, p: _technicians_list(c),
+        description="Administrador: completo. Demais: apenas nome, papel e situação.")
     add("technicians.add", lambda c, p: {"id": c.add_technician(p["name"], p["role"], p["password"])},
         {"name": Param("str", max_len=64), "role": Param("str", choices=("viewer", "technician", "admin")),
          "password": Param("str", max_len=PASSWORD_MAX)})
@@ -133,6 +136,16 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
 
 
 # --- auxiliares ------------------------------------------------------------------------------------------------
+_TECH_PUBLIC_FIELDS = ("name", "role", "active")
+
+
+def _technicians_list(core: NexusCore) -> list[dict[str, Any]]:
+    records = core.technicians.list()
+    if core.can(Permission.TECHNICIANS_MANAGE):
+        return records
+    return [{key: record[key] for key in _TECH_PUBLIC_FIELDS} for record in records]
+
+
 def _scan(core: NexusCore) -> dict[str, Any]:
     report = core.devices.scan()
     return {"found": report.found, "errors": report.errors}

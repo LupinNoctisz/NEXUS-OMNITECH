@@ -13,7 +13,9 @@
       "devices.read",
       "diagnostics.run",
       "modules.manage",
+      "security.read",
       "sessions.run",
+      "settings.read",
       "settings.write",
       "technicians.manage"
     ],

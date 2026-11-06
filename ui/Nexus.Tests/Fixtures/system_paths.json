@@ -2,10 +2,10 @@
   "jsonrpc": "2.0",
   "id": 8,
   "result": {
-    "home": "/tmp/nexus_fixtures_mmzkh_6c/home",
-    "database": "/tmp/nexus_fixtures_mmzkh_6c/home/nexus.db",
-    "logs": "/tmp/nexus_fixtures_mmzkh_6c/home/logs",
-    "backups": "/tmp/nexus_fixtures_mmzkh_6c/home/backups",
-    "modules": "/tmp/nexus_fixtures_mmzkh_6c/home/modules"
+    "home": "/tmp/nexus_fixtures_cf98dgsz/home",
+    "database": "/tmp/nexus_fixtures_cf98dgsz/home/nexus.db",
+    "logs": "/tmp/nexus_fixtures_cf98dgsz/home/logs",
+    "backups": "/tmp/nexus_fixtures_cf98dgsz/home/backups",
+    "modules": "/tmp/nexus_fixtures_cf98dgsz/home/modules"
   }
 }

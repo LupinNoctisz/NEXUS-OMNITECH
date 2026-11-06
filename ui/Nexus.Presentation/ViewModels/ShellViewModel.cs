@@ -17,7 +17,7 @@ public sealed partial class ShellViewModel : ObservableObject
         _api = api;
         _session = session;
         _theme = theme;
-        Items = new List<NavItem>
+        var all = new List<NavItem>
         {
             new("home", "Início", "", () => new HomeViewModel(api, session, dialogs)),
             new("devices", "Dispositivos", "", () => new DevicesViewModel(api, session, dialogs)),
@@ -25,9 +25,12 @@ public sealed partial class ShellViewModel : ObservableObject
             new("history", "Histórico", "", () => new HistoryViewModel(api, session, dialogs)),
             new("modules", "Módulos", "", () => new ModulesViewModel(api, session, dialogs)),
             new("backups", "Backups", "", () => new BackupsViewModel(api, session, dialogs)),
-            new("security", "Segurança", "", () => new SecurityViewModel(api, session, dialogs)),
-            new("settings", "Configurações", "", () => new SettingsViewModel(api, session, dialogs, theme, runtime)),
+            new("security", "Segurança", "", () => new SecurityViewModel(api, session, dialogs), "security.read"),
+            new("settings", "Configurações", "", () => new SettingsViewModel(api, session, dialogs, theme, runtime), "settings.read"),
+            new("account", "Minha conta", "", () => new AccountViewModel(api, session, dialogs)),
         };
+        // seções administrativas ficam escondidas de quem não tem a permissão (o núcleo também recusa a chamada)
+        Items = all.Where(item => item.Requires is null || session.Can(item.Requires)).ToList();
     }
 
     public IReadOnlyList<NavItem> Items { get; }
@@ -62,7 +65,10 @@ public sealed partial class ShellViewModel : ObservableObject
     {
         try
         {
-            var settings = await _api.GetSettingsAsync();
+            // sem 'settings.read' o núcleo recusaria (e auditaria) a chamada: o tema padrão vale até o usuário alternar
+            var settings = _session.Can("settings.read")
+                ? await _api.GetSettingsAsync()
+                : new Dictionary<string, System.Text.Json.JsonElement>();
             if (settings.TryGetValue("ui.theme", out var theme) && theme.ValueKind == System.Text.Json.JsonValueKind.String)
             {
                 _theme.Apply(theme.GetString() ?? "dark");

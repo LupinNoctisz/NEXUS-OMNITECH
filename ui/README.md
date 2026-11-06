@@ -13,7 +13,7 @@ sem porta de rede, e não executa comandos do sistema.
 |---|---|
 | `Nexus.CoreClient` | Transporte (processo filho), JSON-RPC 2.0, API tipada (`ICoreApi`) e DTOs que espelham o JSON do núcleo |
 | `Nexus.Presentation` | ViewModels (MVVM, CommunityToolkit.Mvvm) **sem dependência de WPF**, logo testáveis |
-| `Nexus.App` | WPF: janela, login, 8 telas (Início, Dispositivos, Diagnósticos, Histórico, Módulos, Backups, Segurança, Configurações), temas escuro/claro |
+| `Nexus.App` | WPF: janela, login, 9 telas (Início, Dispositivos, Diagnósticos, Histórico, Módulos, Backups, Segurança e Configurações [só administrador], Minha conta), temas escuro/claro |
 | `Nexus.Tests` | xunit: contrato com respostas reais do núcleo (`Fixtures/`), JSON-RPC, ViewModels e um teste **ponta a ponta com o núcleo real** |
 
 > Para **instalar como um programa normal** (atalhos, menu Iniciar, desinstalador), veja [docs/INSTALACAO.md](../docs/INSTALACAO.md).

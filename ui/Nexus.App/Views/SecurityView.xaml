@@ -72,38 +72,18 @@
             <TextBlock Text="{Binding TechnicianMessage}" Style="{StaticResource Muted}" Margin="0,6,0,0"
                        Visibility="{Binding TechnicianMessage, Converter={StaticResource TextVisible}}"/>
 
-            <Grid Margin="0,14,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Style="{StaticResource Card}" Margin="0,0,8,0">
-                    <StackPanel>
-                        <TextBlock Text="ALTERAR MINHA SENHA" Style="{StaticResource SectionTitle}"/>
-                        <PasswordBox x:Name="OldBox" Margin="0,0,0,6" ToolTip="Senha atual"/>
-                        <PasswordBox x:Name="NewBox" Margin="0,0,0,6" ToolTip="Nova senha (mín. 10 caracteres)"/>
-                        <PasswordBox x:Name="NewConfirmBox" Margin="0,0,0,8" ToolTip="Confirmar nova senha"/>
-                        <Button Content="Alterar senha" Click="ChangePassword_Click" Margin="0" HorizontalAlignment="Left"/>
-                        <TextBlock Text="{Binding PasswordMessage}" Style="{StaticResource Muted}" Margin="0,6,0,0"
-                                   Visibility="{Binding PasswordMessage, Converter={StaticResource TextVisible}}"/>
-                        <TextBlock Text="Informe: atual, nova e confirmação, nessa ordem." Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Style="{StaticResource Card}" Margin="8,0,0,0"
-                        Visibility="{Binding CanManageTechnicians, Converter={StaticResource BoolVisible}}">
-                    <StackPanel>
-                        <TextBlock Text="NOVO TÉCNICO" Style="{StaticResource SectionTitle}"/>
-                        <TextBox Text="{Binding NewTechnicianName, UpdateSourceTrigger=PropertyChanged}" ToolTip="Nome do técnico" Margin="0,0,0,6"/>
-                        <ComboBox ItemsSource="{Binding RoleOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
-                                  SelectedValue="{Binding NewTechnicianRole, Mode=TwoWay}" Margin="0,0,0,6"/>
-                        <PasswordBox x:Name="TechPasswordBox" Margin="0,0,0,6" ToolTip="Senha inicial"/>
-                        <PasswordBox x:Name="TechConfirmBox" Margin="0,0,0,8" ToolTip="Confirmar senha"/>
-                        <Button Content="Adicionar técnico" Click="AddTechnician_Click" Margin="0" HorizontalAlignment="Left"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
+            <Border Style="{StaticResource Card}" Margin="0,14,0,0" MaxWidth="420" HorizontalAlignment="Left"
+                    Visibility="{Binding CanManageTechnicians, Converter={StaticResource BoolVisible}}">
+                <StackPanel>
+                    <TextBlock Text="NOVO TÉCNICO" Style="{StaticResource SectionTitle}"/>
+                    <TextBox Text="{Binding NewTechnicianName, UpdateSourceTrigger=PropertyChanged}" ToolTip="Nome do técnico" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding RoleOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                              SelectedValue="{Binding NewTechnicianRole, Mode=TwoWay}" Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="TechPasswordBox" Margin="0,0,0,6" ToolTip="Senha inicial"/>
+                    <PasswordBox x:Name="TechConfirmBox" Margin="0,0,0,8" ToolTip="Confirmar senha"/>
+                    <Button Content="Adicionar técnico" Click="AddTechnician_Click" Margin="0" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

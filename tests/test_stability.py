@@ -186,3 +186,57 @@ def test_rpc_permission_matrix_for_mutating_methods(core, login_as, role):
         error = json.loads(raw).get("error")
         allowed = any(str(p) == permission for p in ROLE_PERMISSIONS[Role(role)])
         assert (error is not None and error["code"] == -32001) == (not allowed), (role, method, error)
+
+
+# --- leitura restrita (decisão do dono: Segurança/Configurações só admin; lista de técnicos reduzida) ---
+ADMIN_ONLY_READS = ("security.overview", "settings.get_all", "system.paths")
+
+
+@pytest.mark.parametrize("role", ["viewer", "technician"])
+def test_admin_only_reads_are_denied_and_audited(core, login_as, role):
+    import json
+    from nexus.api.server import RpcServer
+
+    login_as("u-" + role, role)
+    server = RpcServer(core)
+    for method in ADMIN_ONLY_READS:
+        reply = json.loads(server.handle(json.dumps({"jsonrpc": "2.0", "id": 1, "method": method}).encode()))
+        assert reply["error"]["code"] == -32001, method
+    denied = [r for r in core.audit.recent(50) if r["action"] == "permission.denied"]
+    assert len(denied) >= len(ADMIN_ONLY_READS)
+
+
+def test_admin_can_still_read_everything(core):
+    import json
+    from nexus.api.server import RpcServer
+
+    server = RpcServer(core)
+    core.login("admin", PASSWORD)
+    for method in ADMIN_ONLY_READS:
+        reply = json.loads(server.handle(json.dumps({"jsonrpc": "2.0", "id": 1, "method": method}).encode()))
+        assert "result" in reply, method
+
+
+def test_technician_list_is_minimal_for_non_admins_and_complete_for_admin(core, login_as):
+    import json
+    from nexus.api.server import RpcServer
+
+    login_as("tec", "technician")
+    server = RpcServer(core)
+
+    def listing():
+        return json.loads(server.handle(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "technicians.list"}).encode()))["result"]
+
+    rows = listing()
+    assert {r["name"] for r in rows} >= {"admin", "tec"}
+    assert all(set(r) == {"name", "role", "active"} for r in rows)
+    login_as("admin")
+    assert all({"failed_attempts", "locked_until", "has_password", "created_at"} <= set(r) for r in listing())
+
+
+def test_missing_password_alert_is_only_for_admin(core, login_as):
+    core.db.execute("INSERT INTO technicians(name, role, active, created_at) VALUES ('sem.senha','viewer',1,'2026-01-01T00:00:00+00:00')")
+    login_as("tec", "technician")
+    assert not any("sem senha" in a["message"] for a in core.status()["alerts"])
+    login_as("admin")
+    assert any("sem senha" in a["message"] for a in core.status()["alerts"])

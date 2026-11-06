@@ -381,6 +381,11 @@
         <v:SecurityView/>
     </DataTemplate>
 
+    <!-- ===================== Minha conta ===================== -->
+    <DataTemplate DataType="{x:Type p:AccountViewModel}">
+        <v:AccountView/>
+    </DataTemplate>
+
     <!-- ===================== Configurações ===================== -->
     <DataTemplate DataType="{x:Type p:SettingsViewModel}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">

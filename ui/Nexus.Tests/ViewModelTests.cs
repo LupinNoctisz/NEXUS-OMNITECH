@@ -426,7 +426,7 @@ public class SecuritySettingsLoginShellTests
     public async Task Change_password_validates_confirmation_before_calling_the_core()
     {
         var api = new FakeCoreApi();
-        var vm = new SecurityViewModel(api, Make.Admin(), new FakeDialogs());
+        var vm = new AccountViewModel(api, Make.Admin(), new FakeDialogs());
 
         Assert.False(await vm.ChangePasswordAsync("antiga", "nova-senha-1", "diferente"));
         Assert.Equal(0, api.CallCount("change_password"));
@@ -537,11 +537,11 @@ public class SecuritySettingsLoginShellTests
     }
 
     [Fact]
-    public void Shell_exposes_the_eight_sections_in_order()
+    public void Shell_exposes_the_sections_in_order_for_admin()
     {
         var shell = new ShellViewModel(new FakeCoreApi(), Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         Assert.Equal(
-            new[] { "Início", "Dispositivos", "Diagnósticos", "Histórico", "Módulos", "Backups", "Segurança", "Configurações" },
+            new[] { "Início", "Dispositivos", "Diagnósticos", "Histórico", "Módulos", "Backups", "Segurança", "Configurações", "Minha conta" },
             shell.Items.Select(i => i.Title).ToArray());
     }
 
@@ -605,6 +605,41 @@ public class SecuritySettingsLoginShellTests
         await Task.Delay(200);
 
         Assert.True(requested);
+    }
+
+    [Fact]
+    public void Shell_hides_security_and_settings_from_non_admins_but_keeps_account()
+    {
+        var shell = new ShellViewModel(new FakeCoreApi(), Make.Viewer(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
+        var titles = shell.Items.Select(i => i.Title).ToArray();
+        Assert.DoesNotContain("Segurança", titles);
+        Assert.DoesNotContain("Configurações", titles);
+        Assert.Contains("Minha conta", titles);
+        Assert.Contains("Início", titles);
+    }
+
+    [Fact]
+    public async Task Shell_does_not_request_settings_when_the_user_lacks_settings_read()
+    {
+        var api = new FakeCoreApi();
+        var shell = new ShellViewModel(api, Make.Viewer(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
+        await shell.InitializeAsync();
+        Assert.Equal(0, api.CallCount("settings.get"));
+
+        var adminApi = new FakeCoreApi();
+        await new ShellViewModel(adminApi, Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime()).InitializeAsync();
+        Assert.Equal(1, adminApi.CallCount("settings.get"));
+    }
+
+    [Fact]
+    public async Task Account_page_lists_technicians_for_a_viewer_and_changes_own_password()
+    {
+        var api = new FakeCoreApi();
+        var vm = new AccountViewModel(api, Make.Viewer(), new FakeDialogs());
+        await vm.LoadAsync();
+        Assert.Equal(api.Technicians.Count, vm.Technicians.Count);
+        Assert.True(await vm.ChangePasswordAsync("antiga-123", "nova-senha-1", "nova-senha-1"));
+        Assert.Equal(1, api.CallCount("change_password"));
     }
 
     [Fact]

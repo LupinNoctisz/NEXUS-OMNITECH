@@ -33,3 +33,14 @@
 
 ## Princípios que guiam os próximos módulos
 Não contornar proteções antirroubo (FRP, iCloud etc.) ou de fabricantes, não acessar dados sem autorização do proprietário, não desabilitar mecanismos de segurança do Windows, usar apenas drivers/ferramentas de fontes oficiais.
+
+## Quem pode ler o quê (Fase 2)
+
+| Área | Leitor | Técnico | Administrador |
+|---|---|---|---|
+| Lista de técnicos | só nome, papel e situação | só nome, papel e situação | completa (bloqueios, senha definida, datas) |
+| Segurança (`security.overview`) | bloqueado | bloqueado | total |
+| Configurações e caminhos (`settings.get_all`, `system.paths`) | bloqueado | bloqueado | total |
+| Trocar a própria senha ("Minha conta") | sim | sim | sim |
+
+A recusa é feita no núcleo (permissões `security.read` e `settings.read`, só do administrador) e registrada na auditoria; a interface apenas esconde as telas. Quem não é administrador usa o tema escuro/claro só na sessão atual.
