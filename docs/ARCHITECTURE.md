@@ -45,3 +45,9 @@ Na UI, o login acontece por `auth.login` e vale para aquele processo do núcleo.
 - **Esquema v3**: índices parciais/compostos em `sessions` (abertas) e `devices` (conexão, último contato), para que o painel não varra tabelas inteiras.
 - **Backup automático antes de migrar**: se o banco existente é de esquema mais antigo, uma cópia verificada (`*-pre-migration-vN.db` + `.sha256`) é criada antes; banco mais novo que o NEXUS é recusado sem alteração.
 - **Verificação da auditoria**: em lotes (memória constante). O painel inicial usa conferência *incremental* (só registros novos) e refaz a conferência **completa** no máximo a cada 5 min; a tela Segurança e `audit.verify` sempre conferem tudo. Limitação conhecida: adulteração de registro antigo pode levar até 5 min para aparecer no painel inicial. A primeira chamada após iniciar o núcleo ou restaurar um backup é completa.
+
+## Falhas e logs (Fase 2.1)
+
+- **Armazenamento**: banco ilegível/corrompido ou pasta de dados inacessível geram `StorageError` com mensagem clara ("restaure uma cópia da pasta backups; não apague a pasta de dados") e **nenhum dado é alterado**. Erros inesperados na linha de comando saem com código 70 e mensagem curta (detalhes no log; `NEXUS_DEBUG=1` mostra o traceback).
+- **Interface fechada no meio de uma resposta** (`BrokenPipe`): o núcleo encerra limpo e registra o fato.
+- **Logs** (`logs/nexus.log`, JSON, rotativo, sem senhas): início/encerramento, migração do banco (com o nome do backup `pre-migration`), backup criado, backup restaurado, falha de backup, login recusado (com bloqueio), permissão negada, falhas de módulos/provedores. Se a pasta de logs não for gravável, os registros vão para o stderr e o núcleo continua.

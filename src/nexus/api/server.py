@@ -117,6 +117,8 @@ def run_stdio(core: NexusCore) -> int:
     sys.stdout = sys.stderr  # protege o canal do protocolo contra prints acidentais
     try:
         RpcServer(core).serve(stdin, stdout)
+    except (BrokenPipeError, ConnectionError):
+        core.log.info("interface desconectada durante uma resposta; encerrando")  # a interface fechou: não é defeito
     finally:
         sys.stdout = sys.__stdout__
     return 0

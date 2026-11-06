@@ -10,6 +10,7 @@ from .errors import (
     NexusError,
     PermissionDenied,
     SchemaVersionError,
+    StorageError,
     ValidationError,
 )
 
@@ -17,6 +18,7 @@ __all__ = [
     "NexusCore",
     "NexusError",
     "SchemaVersionError",
+    "StorageError",
     "PermissionDenied",
     "AuthenticationError",
     "ConfirmationRequired",

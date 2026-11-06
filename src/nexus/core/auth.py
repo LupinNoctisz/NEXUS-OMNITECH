@@ -113,6 +113,7 @@ class AuthService:
             locked_now = False
         core.audit.record("auth.login", technician=ANONYMOUS, target=name, outcome="failed",
                           details={"locked": locked or locked_now})
+        core.log.warning("login recusado", extra={"technician": name, "locked": locked or locked_now})
         raise AuthenticationError(GENERIC_FAILURE)
 
     def set_password(self, name: str, new_password: str, old_password: str | None = None) -> str:

@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import getpass
 import json
+import os
+import logging
 import sys
 from pathlib import Path
 
@@ -222,6 +224,16 @@ def main(argv: list[str] | None = None) -> int:
     except json.JSONDecodeError as exc:
         print(f"Valor JSON inválido: {exc}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt:
+        return 130
+    except Exception as exc:  # noqa: BLE001 - defeito inesperado: mensagem curta; detalhes no log (ou NEXUS_DEBUG=1)
+        nexus_log = logging.getLogger("nexus")
+        if nexus_log.handlers:  # sem handler (falha ao abrir o núcleo) evitaria o traceback duplicado do logging
+            nexus_log.exception("erro inesperado")
+        print(f"Erro inesperado ({type(exc).__name__}): {exc}. Consulte o log do NEXUS na pasta de dados.", file=sys.stderr)
+        if os.environ.get("NEXUS_DEBUG") == "1":
+            raise
+        return 70
 
 
 if __name__ == "__main__":

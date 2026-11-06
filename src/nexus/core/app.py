@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -12,7 +13,7 @@ from .auth import AuthService, hash_password
 from .backup import BackupManager
 from .database import SCHEMA_VERSION, Database
 from .devices import DeviceRegistry
-from .errors import NexusError, PermissionDenied, ValidationError
+from .errors import NexusError, PermissionDenied, StorageError, ValidationError
 from .logging_setup import close_logging, setup_logging
 from .modules import ModuleRegistry
 from .paths import Paths, default_home
@@ -28,8 +29,19 @@ SESSION_STALE_HOURS = 24
 class NexusCore:
     def __init__(self, home: Path | str | None = None, module_dirs: list[Path] | None = None):
         self.paths = Paths(Path(home).expanduser() if home else default_home())
-        self.paths.ensure()
-        self.db = Database(self.paths.db)
+        try:
+            self.paths.ensure()
+        except OSError as exc:
+            raise StorageError(
+                f"Não foi possível acessar a pasta de dados do NEXUS ({self.paths.home}): {exc}. "
+                "Verifique permissões e espaço em disco; nenhum dado foi alterado.") from exc
+        try:
+            self.db = Database(self.paths.db)
+        except sqlite3.Error as exc:
+            raise StorageError(
+                f"Não foi possível abrir o banco de dados local ({self.paths.db}): {exc}. Nenhum dado foi alterado. "
+                "Se o arquivo estiver corrompido, restaure uma cópia da pasta 'backups' (ou do seu backup externo); "
+                "não apague a pasta de dados.") from exc
         self.settings = SettingsStore(self.db)
         self.log = setup_logging(self.paths.logs, self.settings.get("log.level"))
         self.audit = AuditLog(self.db)
@@ -42,7 +54,10 @@ class NexusCore:
         self.safety = SafetyGuard(self)
         bundled = Path(__file__).resolve().parents[3] / "modules"
         self.modules = ModuleRegistry(self, module_dirs or [self.paths.modules, bundled], __version__)
-        self.log.info("núcleo iniciado", extra={"version": __version__})
+        self.log.info("núcleo iniciado", extra={"version": __version__, "schema": self.db.schema_version})
+        if self.db.migrated_from is not None:
+            self.log.info("banco migrado", extra={"from": self.db.migrated_from, "to": self.db.schema_version,
+                                                  "backup": self.db.pre_migration_backup})
 
     # -- identidade e permissões ------------------------------------------
     @property
@@ -81,6 +96,7 @@ class NexusCore:
         if not self.can(permission):
             self.audit.record("permission.denied", technician=self._actor, outcome="denied",
                               details={"permission": str(permission), "role": str(self.role)})
+            self.log.warning("permissão negada", extra={"technician": self._actor, "permission": str(permission)})
             raise PermissionDenied(
                 f"'{self._actor}' ({self.role}) não possui a permissão '{permission}'.")
 
@@ -196,6 +212,7 @@ class NexusCore:
         }
 
     def close(self) -> None:
+        self.log.info("núcleo encerrado")
         self.modules.unload_all()
         self.db.close()
         close_logging()

@@ -21,6 +21,10 @@ class ConfirmationRequired(NexusError):
     """Operação sensível exige confirmação/autorização explícita."""
 
 
+class StorageError(NexusError):
+    """O armazenamento local (banco ou pasta de dados) está ilegível, corrompido ou inacessível."""
+
+
 class IntegrityError(NexusError):
     """Falha de verificação de integridade (módulo, log, arquivo)."""
 

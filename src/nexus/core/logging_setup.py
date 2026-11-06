@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -32,10 +33,15 @@ def setup_logging(log_dir: Path, level: str = "INFO") -> logging.Logger:
     logger = logging.getLogger("nexus")
     logger.setLevel(getattr(logging, level.upper(), logging.INFO))
     close_logging()
-    Path(log_dir).mkdir(parents=True, exist_ok=True)
-    handler = RotatingFileHandler(
-        Path(log_dir) / "nexus.log", maxBytes=2_000_000, backupCount=5, encoding="utf-8"
-    )
+    try:
+        Path(log_dir).mkdir(parents=True, exist_ok=True)
+        handler: logging.Handler = RotatingFileHandler(
+            Path(log_dir) / "nexus.log", maxBytes=2_000_000, backupCount=5, encoding="utf-8"
+        )
+    except OSError as exc:
+        # sem pasta de logs gravável o núcleo continua: os registros vão para o stderr (a interface guarda o seu próprio log)
+        handler = logging.StreamHandler()
+        print(f"Aviso: não foi possível gravar os logs em {log_dir} ({exc}); usando a saída de erro.", file=sys.stderr)
     handler.setFormatter(JsonFormatter())
     handler.set_name("nexus-file")
     logger.addHandler(handler)

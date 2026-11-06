@@ -104,6 +104,8 @@ class Database:
         self.path = str(path)
         self._lock = threading.RLock()
         self._depth = 0
+        self.migrated_from: int | None = None   # versão anterior do esquema, se houve migração nesta abertura
+        self.pre_migration_backup: str | None = None
         self._conn = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
@@ -119,6 +121,8 @@ class Database:
                 raise SchemaVersionError(
                     f"Este banco de dados é da versão {current} do esquema, mais nova que a suportada por este NEXUS "
                     f"({SCHEMA_VERSION}). Atualize o NEXUS; o banco não foi alterado.")
+            if 0 < current < SCHEMA_VERSION:
+                self.migrated_from = current
             if 0 < current < SCHEMA_VERSION and self.path != ":memory:":
                 self._backup_before_migration(current)
             for version, sql in MIGRATIONS:
@@ -155,6 +159,7 @@ class Database:
                 check.close()
             digest = sha256_file(target)
             Path(str(target) + ".sha256").write_text(f"{digest}  {target.name}\n", encoding="utf-8")
+            self.pre_migration_backup = target.name
         except Exception as exc:
             target.unlink(missing_ok=True)
             raise BackupError(

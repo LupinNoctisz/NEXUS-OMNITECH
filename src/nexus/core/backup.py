@@ -61,10 +61,12 @@ class BackupManager:
             Path(str(target) + ".sha256").write_text(f"{digest}  {target.name}\n", encoding="utf-8")
         except Exception as exc:
             target.unlink(missing_ok=True)
+            self._core.log.error("falha ao criar backup", extra={"error": str(exc)})
             raise BackupError(f"Falha ao criar backup: {exc}") from exc
         self._prune()
         self._core.audit.record("backup.create", technician=self._core.actor, target=target.name,
                                 details={"reason": reason, "sha256": digest})
+        self._core.log.info("backup criado", extra={"backup": target.name, "reason": reason})
         return target
 
     def list(self) -> list[Path]:
@@ -118,7 +120,9 @@ class BackupManager:
         self._core.audit.record("backup.restore", technician=who, target=path.name,
                                 details={"pre_restore_backup": safety_copy.name})
         # o backup pode não conter (ou conter inativo) o técnico que restaurou
-        self._core.revalidate_actor()
+        still_logged_in = self._core.revalidate_actor()
+        self._core.log.info("backup restaurado", extra={"backup": path.name, "safety_copy": safety_copy.name,
+                                                       "session_kept": still_logged_in})
         return safety_copy
 
     def _prune(self) -> None:
