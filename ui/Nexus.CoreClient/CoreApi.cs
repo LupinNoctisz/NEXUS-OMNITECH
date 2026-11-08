@@ -59,6 +59,9 @@ public sealed class CoreApi : ICoreApi
     public Task<ScanResult> ScanDevicesAsync(CancellationToken ct = default)
         => _rpc.InvokeAsync<ScanResult>("devices.scan", null, ct);
 
+    public Task<DeviceIdentification> IdentifyDeviceAsync(string text, CancellationToken ct = default)
+        => _rpc.InvokeAsync<DeviceIdentification>("devices.identify", P(("text", text)), ct);
+
     public async Task<long> AddDeviceAsync(string kind, string? vendor, string? model, string? serial,
         string? label, CancellationToken ct = default)
     {

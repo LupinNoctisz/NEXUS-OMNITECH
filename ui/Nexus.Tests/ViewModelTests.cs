@@ -155,6 +155,34 @@ public class DevicesAndDiagnosticsTests
     }
 
     [Fact]
+    public async Task Identify_fills_the_three_fields_as_a_suggestion_without_registering()
+    {
+        var api = new FakeCoreApi();
+        var vm = new DevicesViewModel(api, Make.Admin(), new FakeDialogs()) { IdentifyText = "Dell Inspiron 15 3520 S/N: ABC1234" };
+
+        await vm.IdentifyCommand.ExecuteAsync(null);
+
+        Assert.Equal("Dell", vm.NewVendor);
+        Assert.Equal("Inspiron 15 3520", vm.NewModel);
+        Assert.Equal("ABC1234", vm.NewSerial);
+        Assert.Contains("confira", vm.Message);
+        Assert.Equal(1, api.CallCount("devices.identify"));
+        Assert.Equal(0, api.CallCount("devices.add"));
+    }
+
+    [Fact]
+    public async Task Identify_with_empty_text_is_rejected_without_calling_the_core()
+    {
+        var api = new FakeCoreApi();
+        var vm = new DevicesViewModel(api, Make.Admin(), new FakeDialogs());
+
+        await vm.IdentifyCommand.ExecuteAsync(null);
+
+        Assert.True(vm.HasError);
+        Assert.Equal(0, api.CallCount("devices.identify"));
+    }
+
+    [Fact]
     public async Task Add_with_empty_fields_is_rejected_without_calling_the_core()
     {
         var api = new FakeCoreApi();

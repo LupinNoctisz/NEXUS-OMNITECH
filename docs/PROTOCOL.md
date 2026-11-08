@@ -49,6 +49,7 @@ A interface (WPF) inicia o núcleo como **processo filho**: `python -m nexus --h
 | `devices.list` | sim | `connection?` | lista |
 | `devices.scan` | sim | – | `{found, errors}` |
 | `devices.add` | sim | `kind`, `vendor?`, `model?`, `serial?`, `label?` | `{id}` |
+| `devices.identify` | sim | `text` (até 2000) | `{kind, vendor, model, serial, sources, alternatives, warnings}` — só sugere (não grava); exige `devices.manage`; valores de preenchimento ("To be filled by O.E.M.", "0000") são descartados e vários seriais nunca são adivinhados |
 | `sessions.recent` / `sessions.open` | sim | `limit?` | lista |
 | `sessions.start` | sim | `device_id`, `kind?` | `{id}` |
 | `sessions.finish` | sim | `id`, `status?`, `summary?` | `{ok}` |

@@ -102,6 +102,14 @@ public sealed class FakeCoreApi : ICoreApi
 
     public Task<ScanResult> ScanDevicesAsync(CancellationToken ct = default) { Record("devices.scan"); return Task.FromResult(Scan); }
 
+    public DeviceIdentification Identification = Fixture.Result<DeviceIdentification>("identify_result");
+
+    public Task<DeviceIdentification> IdentifyDeviceAsync(string text, CancellationToken ct = default)
+    {
+        Record("devices.identify", text);
+        return Task.FromResult(Identification);
+    }
+
     public Task<long> AddDeviceAsync(string kind, string? vendor, string? model, string? serial, string? label,
         CancellationToken ct = default)
     {

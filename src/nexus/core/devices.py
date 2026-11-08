@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Protocol
 
 from .errors import ValidationError
+from .identify import clean_value, identify
 from .permissions import Permission
 from .util import sha256_bytes, utc_now
 
@@ -55,17 +56,50 @@ class ScanReport:
 # Provedores
 # --------------------------------------------------------------------------
 class LocalHostProvider:
-    """Identifica o computador onde o NEXUS está rodando (dados reais da plataforma)."""
+    """Identifica o computador onde o NEXUS está rodando (dados reais da plataforma).
+
+    Fabricante, modelo e serial vêm do firmware (DMI no Linux; CIM no Windows). Textos de
+    preenchimento como "To be filled by O.E.M." são descartados: o campo fica vazio.
+    """
 
     name = "local-host"
 
+    def __init__(self, dmi_root: Path | None = None, runner: Callable[[list[str]], str] | None = None,
+                 platform_name: str | None = None):
+        self._dmi = dmi_root or Path("/sys/class/dmi/id")
+        self._run = runner or UsbProvider._default_runner
+        self._platform = platform_name or sys.platform
+
+    def _hardware_identity(self) -> dict[str, str | None]:
+        empty: dict[str, str | None] = {"vendor": None, "model": None, "serial": None}
+        try:
+            if self._platform == "win32":
+                script = ("$c = Get-CimInstance Win32_ComputerSystem; $b = Get-CimInstance Win32_BIOS; "
+                          "[pscustomobject]@{Manufacturer=$c.Manufacturer; Model=$c.Model; Serial=$b.SerialNumber} "
+                          "| ConvertTo-Json -Compress")
+                data = json.loads(self._run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script]) or "{}")
+                return {"vendor": clean_value(data.get("Manufacturer")), "model": clean_value(data.get("Model")),
+                        "serial": clean_value(data.get("Serial"))}
+            if self._platform.startswith("linux"):
+                return {"vendor": clean_value(_read(self._dmi / "sys_vendor")),
+                        "model": clean_value(_read(self._dmi / "product_name")),
+                        # product_serial exige privilégio de administrador no Linux; sem ele fica vazio
+                        "serial": clean_value(_read(self._dmi / "product_serial"))}
+        except (OSError, ValueError, subprocess.SubprocessError, AttributeError):
+            pass  # identificação é opcional: o computador continua listado pelo nome
+        return empty
+
     def discover(self) -> list[DeviceInfo]:
         node = platform.node() or "desconhecido"
+        identity = self._hardware_identity()
         return [
             DeviceInfo(
                 uid="host:" + sha256_bytes(node.encode("utf-8"))[:16],
                 kind="pc",
                 source=self.name,
+                vendor=identity["vendor"],
+                model=identity["model"],
+                serial=identity["serial"],
                 label=node,
                 properties={
                     "os": platform.system(),
@@ -124,14 +158,14 @@ class UsbProvider:
                 continue  # root hubs/entradas sem ID
             if _read(entry / "bDeviceClass") == _HUB_CLASS:
                 continue
-            serial = _read(entry / "serial")
+            serial = clean_value(_read(entry / "serial"))
             devices.append(
                 DeviceInfo(
                     uid=f"usb:{vid}:{pid}:{serial or entry.name}",
                     kind="usb",
                     source=self.name,
-                    vendor=_read(entry / "manufacturer"),
-                    model=_read(entry / "product"),
+                    vendor=clean_value(_read(entry / "manufacturer")),
+                    model=clean_value(_read(entry / "product")),
                     serial=serial,
                     properties={"vendor_id": vid, "product_id": pid, "bus_path": entry.name,
                                 "speed_mbps": _read(entry / "speed")},
@@ -163,13 +197,16 @@ class UsbProvider:
                 continue
             vid, pid = match.group(1).lower(), match.group(2).lower()
             tail = instance.rsplit("\\", 1)[-1]
+            # Se o Windows gerou o sufixo (contém "&"), ele NÃO é o serial do aparelho.
+            serial = clean_value(tail) if "&" not in tail and len(tail) >= 4 else None
             devices.append(
                 DeviceInfo(
                     uid=f"usb:{vid}:{pid}:{tail}",
                     kind="usb",
                     source=source,
-                    vendor=item.get("Manufacturer"),
-                    model=item.get("FriendlyName"),
+                    vendor=clean_value(item.get("Manufacturer")),
+                    model=clean_value(item.get("FriendlyName")),
+                    serial=serial,
                     properties={"vendor_id": vid, "product_id": pid, "instance_id": instance,
                                 "pnp_status": item.get("Status")},
                 )
@@ -204,9 +241,15 @@ class DeviceRegistry:
         )
         return int(self._core.db.query_one("SELECT id FROM devices WHERE uid = ?", (info.uid,))["id"])
 
+    def identify(self, text: str) -> dict[str, Any]:
+        """Sugere fabricante, modelo e serial a partir de um texto. Não grava nada."""
+        self._core.require(Permission.DEVICES_MANAGE)
+        return identify(text)
+
     def add_manual(self, kind: str, *, vendor: str | None = None, model: str | None = None,
                    serial: str | None = None, label: str | None = None) -> int:
         self._core.require(Permission.DEVICES_MANAGE)
+        vendor, model, serial, label = (clean_value(v) for v in (vendor, model, serial, label))
         if not any((vendor, model, serial, label)):
             raise ValidationError("Informe ao menos fabricante, modelo, serial ou identificação.")
         device_id = self.upsert(DeviceInfo(

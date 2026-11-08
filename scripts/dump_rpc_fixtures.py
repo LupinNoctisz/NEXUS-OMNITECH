@@ -84,6 +84,7 @@ def main() -> None:
         call("system_paths", "system.paths")
         call("devices_list", "devices.list")
         call("scan_result", "devices.scan")
+        call("identify_result", "devices.identify", text="Dell Inspiron 15 3520 S/N: ABC1234")
         call("sessions_recent", "sessions.recent", limit=10)
         call("sessions_open", "sessions.open")
         call("audit_list", "audit.list", limit=5)

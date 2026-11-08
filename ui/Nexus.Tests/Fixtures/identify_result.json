@@ -1,0 +1,19 @@
+{
+  "jsonrpc": "2.0",
+  "id": 11,
+  "result": {
+    "kind": null,
+    "vendor": "Dell",
+    "model": "Inspiron 15 3520",
+    "serial": "ABC1234",
+    "sources": {
+      "serial": "rótulo",
+      "vendor": "fabricante conhecido",
+      "model": "texto restante"
+    },
+    "alternatives": {},
+    "warnings": [
+      "O modelo é um palpite (não havia o rótulo 'Modelo:'); confira antes de cadastrar."
+    ]
+  }
+}

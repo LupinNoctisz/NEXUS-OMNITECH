@@ -110,6 +110,11 @@ public class ContractTests
         Assert.Equal(1, scan.Found);
         Assert.Empty(scan.Errors);
 
+        var identified = Fixture.Result<DeviceIdentification>("identify_result");
+        Assert.Equal("Dell", identified.Vendor);
+        Assert.Equal("ABC1234", identified.Serial);
+        Assert.Equal("texto restante", identified.Sources["model"]);
+
         var restore = Fixture.Result<RestoreResult>("restore_result");
         Assert.True(restore.SessionActive);
         Assert.EndsWith(".db", restore.SafetyBackup);

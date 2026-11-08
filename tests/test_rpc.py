@@ -323,3 +323,11 @@ def test_system_paths_are_real_and_require_login(rpc, core):
     assert Path(paths["home"]) == core.paths.home
     assert Path(paths["database"]) == core.paths.db and Path(paths["database"]).is_file()
     assert set(paths) == {"home", "database", "logs", "backups", "modules"}
+
+
+def test_identify_rpc_returns_suggestion_without_writing(logged, core):
+    before = len(core.devices.list())
+    result = logged.ok("devices.identify", text="HP Pavilion S/N: 5CD1234XYZ")
+    assert result["vendor"] == "HP" and result["serial"] == "5CD1234XYZ"
+    assert len(core.devices.list()) == before
+    assert logged.err("devices.identify", text="x" * 2001)["code"] == proto.INVALID_PARAMS

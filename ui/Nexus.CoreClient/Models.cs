@@ -53,6 +53,10 @@ public sealed record SecurityOverview(string Actor, string Role, List<string> Pe
 public sealed record TechnicianDto(long Id, string Name, string Role, bool Active, string CreatedAt,
     int FailedAttempts, string? LockedUntil, bool HasPassword);
 
+// Sugestão de fabricante/modelo/serial a partir de um texto; nada é gravado até o técnico cadastrar.
+public sealed record DeviceIdentification(string? Kind, string? Vendor, string? Model, string? Serial,
+    Dictionary<string, string> Sources, Dictionary<string, List<string>> Alternatives, List<string> Warnings);
+
 public sealed record ScanResult(int Found, Dictionary<string, string> Errors);
 public sealed record RestoreResult(string SafetyBackup, bool SessionActive);
 public sealed record ModuleVerify(bool Ok, List<string> Problems);

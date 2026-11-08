@@ -84,6 +84,10 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
         {"kind": Param("str", choices=KINDS), "vendor": Param("str", False), "model": Param("str", False),
          "serial": Param("str", False), "label": Param("str", False)})
 
+    add("devices.identify", lambda c, p: c.devices.identify(p["text"]),
+        {"text": Param("str", max_len=2000)},
+        description="Sugere fabricante, modelo e serial a partir de um texto (etiqueta/caixa). Não grava; o técnico confere.")
+
     # --- sessões -----------------------------------------------------------------------------
     add("sessions.recent", lambda c, p: c.sessions.recent(p["limit"]),
         {"limit": Param("int", False, minimum=1, maximum=200, default=10)})

@@ -182,6 +182,10 @@
                     <Border Style="{StaticResource Card}" Margin="0,10,0,0" IsEnabled="{Binding CanManage}">
                         <StackPanel>
                             <TextBlock Text="CADASTRAR MANUALMENTE" Style="{StaticResource SectionTitle}"/>
+                            <TextBox Text="{Binding IdentifyText, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True"
+                                     TextWrapping="Wrap" MinHeight="48" MaxHeight="96" VerticalScrollBarVisibility="Auto"
+                                     ToolTip="Cole o texto da etiqueta ou da caixa (ex.: Dell Inspiron 15 S/N: ABC123)" Margin="0,0,0,6"/>
+                            <Button Content="Identificar (separar fabricante, modelo e serial)" Command="{Binding IdentifyCommand}" Margin="0,0,0,10"/>
                             <ComboBox ItemsSource="{Binding KindOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
                                       SelectedValue="{Binding NewKind, Mode=TwoWay}" Margin="0,0,0,6"/>
                             <TextBox Text="{Binding NewLabel, UpdateSourceTrigger=PropertyChanged}" ToolTip="Identificação (ex.: cliente/OS)" Margin="0,0,0,6"/>
@@ -190,7 +194,7 @@
                             <TextBox Text="{Binding NewSerial, UpdateSourceTrigger=PropertyChanged}" ToolTip="Serial" Margin="0,0,0,8"/>
                             <Button Content="Cadastrar" Command="{Binding AddCommand}" Style="{StaticResource PrimaryButton}" Margin="0"/>
                             <TextBlock Style="{StaticResource Muted}" FontSize="11" Margin="0,8,0,0"
-                                       Text="Campos: identificação, fabricante, modelo e serial (preencha ao menos um)."/>
+                                       Text="Identificar só sugere os campos; confira antes de cadastrar. Preencha ao menos um."/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

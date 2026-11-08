@@ -22,6 +22,7 @@ public interface ICoreApi
 
     Task<List<DeviceDto>> ListDevicesAsync(string? connection = null, CancellationToken ct = default);
     Task<ScanResult> ScanDevicesAsync(CancellationToken ct = default);
+    Task<DeviceIdentification> IdentifyDeviceAsync(string text, CancellationToken ct = default);
     Task<long> AddDeviceAsync(string kind, string? vendor, string? model, string? serial, string? label,
         CancellationToken ct = default);
 
