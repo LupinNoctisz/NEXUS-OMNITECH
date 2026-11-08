@@ -44,3 +44,7 @@ Não contornar proteções antirroubo (FRP, iCloud etc.) ou de fabricantes, não
 | Trocar a própria senha ("Minha conta") | sim | sim | sim |
 
 A recusa é feita no núcleo (permissões `security.read` e `settings.read`, só do administrador) e registrada na auditoria; a interface apenas esconde as telas. Quem não é administrador usa o tema escuro/claro só na sessão atual.
+
+## Módulos: o arquivo de entrada (Fase 2)
+
+O `entry` do manifesto deve ficar dentro da pasta do módulo (sem `..` nem caminho absoluto) e constar em `files` com seu SHA-256, para ser verificado antes de qualquer carregamento. Manifestos que não cumprem isso são ignorados (registrado no log).

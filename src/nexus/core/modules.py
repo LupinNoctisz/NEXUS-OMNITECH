@@ -78,9 +78,14 @@ class Manifest:
         if data["status"] == "available":
             if not entry or not _ENTRY.match(entry):
                 raise ModuleError("Módulo 'available' exige 'entry' no formato 'arquivo.py:Classe'.")
+            entry_file = entry.split(":")[0]
+            if entry_file.startswith("/") or ".." in entry_file.split("/"):
+                raise ModuleError("O 'entry' do módulo deve ficar dentro da pasta do próprio módulo.")
         files = data.get("files", {})
         if not isinstance(files, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in files.items()):
             raise ModuleError("'files' deve mapear caminho -> sha256.")
+        if data["status"] == "available" and entry.split(":")[0] not in files:
+            raise ModuleError("O arquivo 'entry' precisa constar em 'files' (com SHA-256) para ser verificado antes de carregar.")
         min_core = data.get("min_core", "0.1.0")
         parse_version(min_core)
         signable = {k: v for k, v in data.items() if k != "signature"}

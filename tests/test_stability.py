@@ -1,5 +1,6 @@
 """Estabilidade: histórico grande, verificação incremental, concorrência e uso de índices."""
 
+import json
 import threading
 import tracemalloc
 
@@ -240,3 +241,138 @@ def test_missing_password_alert_is_only_for_admin(core, login_as):
     assert not any("sem senha" in a["message"] for a in core.status()["alerts"])
     login_as("admin")
     assert any("sem senha" in a["message"] for a in core.status()["alerts"])
+
+
+# --- cobertura de caminhos críticos de segurança (Fase 2) ---------------------------------------------
+@pytest.mark.parametrize("patch, fragment", [
+    ({"id": "SemPonto"}, "ID de módulo inválido"),
+    ({"version": "1.0"}, "Versão inválida"),
+    ({"status": "beta"}, "Status inválido"),
+    ({"entry": "../fora.py:Module"}, "entry"),
+    ({"files": {"a.py": 1}}, "files"),
+    ({"publisher": ""}, "obrigatório"),
+    ({"min_core": "x"}, "Versão inválida"),
+])
+def test_manifest_validation_rejects_bad_fields(make_module, patch, fragment):
+    from nexus.core import ModuleError
+    from nexus.core.modules import Manifest
+
+    root = make_module("valido")
+    data = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    data.update(patch)
+    (root / "manifest.json").write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ModuleError, match=fragment):
+        Manifest.from_dir(root)
+
+
+def test_manifest_must_be_a_json_object(tmp_path):
+    from nexus.core import ModuleError
+    from nexus.core.modules import Manifest
+
+    (tmp_path / "manifest.json").write_text("[1, 2]", encoding="utf-8")
+    with pytest.raises(ModuleError, match="objeto JSON"):
+        Manifest.from_dir(tmp_path)
+    (tmp_path / "manifest.json").write_text("{ não é json", encoding="utf-8")
+    with pytest.raises(ModuleError, match="ilegível"):
+        Manifest.from_dir(tmp_path)
+
+
+def test_module_file_paths_cannot_escape_the_module_folder(core, make_module, tmp_path):
+    root = make_module("fuga")
+    outside = tmp_path / "segredo.txt"
+    outside.write_text("x")
+    data = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    data["files"] = {**data["files"], "../../segredo.txt": "0" * 64}
+    (root / "manifest.json").write_text(json.dumps(data), encoding="utf-8")
+    report = core.modules.verify("nexus.fuga")
+    assert not report.ok and any("fora da pasta" in p for p in report.problems), report.problems
+
+
+def test_entry_file_must_be_hash_verified_and_inside_the_module(core, make_module):
+    from nexus.core import ModuleError
+    from nexus.core.modules import Manifest
+
+    root = make_module("entrada")
+    base = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    for entry, files in (("outro.py:Modulo", base["files"]), ("../x.py:Modulo", {**base["files"], "../x.py": "0" * 64}),
+                         ("/etc/x.py:Modulo", {"/etc/x.py": "0" * 64})):
+        (root / "manifest.json").write_text(json.dumps({**base, "entry": entry, "files": files}), encoding="utf-8")
+        with pytest.raises(ModuleError):
+            Manifest.from_dir(root)
+
+
+def test_untrusted_publisher_and_planned_module_cannot_be_enabled(core, make_module):
+    from nexus.core import ModuleError
+
+    make_module("terceiro", publisher="Desconhecido Ltda")
+    make_module("futuro", status="planned", code="")
+    core.login("admin", PASSWORD)
+    for module_id in ("nexus.terceiro", "nexus.futuro"):
+        with pytest.raises(ModuleError):
+            core.modules.register(module_id, confirmed=True)
+
+
+def test_destructive_guard_rejects_blank_operation_and_unknown_device(core):
+    from nexus.core import ValidationError
+    from nexus.core.safety import DestructiveRequest
+
+    core.login("admin", PASSWORD)
+    device = core.devices.add_manual("usb", label="bancada")
+    ok_kwargs = dict(description="teste", owner_authorization="Autorizado por Maria Silva, OS 1234", confirmed=True)
+    with pytest.raises(ValidationError):
+        core.safety.run(DestructiveRequest(operation=" ", device_id=device, **ok_kwargs), lambda: 1, lambda: None)
+    with pytest.raises(ValidationError):
+        core.safety.run(DestructiveRequest(operation="x", device_id=9999, **ok_kwargs), lambda: 1, lambda: None)
+
+
+# --- falhas no banco: nada pela metade -------------------------------------------------------------------
+def test_failed_migration_rolls_back_and_keeps_old_version(tmp_path, monkeypatch):
+    import sqlite3
+    from nexus.core import database
+
+    path = tmp_path / "nexus.db"
+    conn = sqlite3.connect(path)
+    conn.executescript(database.MIGRATIONS[0][1] + "\nPRAGMA user_version = 1;")
+    conn.close()
+    broken = list(database.MIGRATIONS) + [(4, "CREATE TABLE ok_antes (x); CREATE TABLE ok_antes (y);")]
+    monkeypatch.setattr(database, "MIGRATIONS", broken)
+    monkeypatch.setattr(database, "SCHEMA_VERSION", 4)
+    with pytest.raises(sqlite3.OperationalError):
+        database.Database(path)
+    check = sqlite3.connect(path)
+    try:
+        assert check.execute("PRAGMA user_version").fetchone()[0] == 3      # v2 e v3 aplicadas; a v4 voltou inteira
+        assert check.execute("SELECT name FROM sqlite_master WHERE name = 'ok_antes'").fetchone() is None
+    finally:
+        check.close()
+    assert list((tmp_path / "backups").glob("*pre-migration-v1*.db"))       # backup foi feito antes de tudo
+
+
+def test_pre_migration_backup_failure_stops_before_touching_the_database(tmp_path, monkeypatch):
+    import sqlite3
+    from nexus.core import BackupError, database
+
+    path = tmp_path / "nexus.db"
+    conn = sqlite3.connect(path)
+    conn.executescript(database.MIGRATIONS[0][1] + "\nPRAGMA user_version = 1;")
+    conn.close()
+    monkeypatch.setattr(database, "sha256_file", lambda p: (_ for _ in ()).throw(OSError("disco cheio")))
+    with pytest.raises(BackupError, match="nada foi alterado"):
+        database.Database(path)
+    check = sqlite3.connect(path)
+    try:
+        assert check.execute("PRAGMA user_version").fetchone()[0] == 1
+    finally:
+        check.close()
+    assert not list((tmp_path / "backups").glob("*.db"))                  # cópia incompleta removida
+
+
+def test_backup_create_failure_leaves_no_partial_file(core, monkeypatch):
+    from nexus.core import BackupError
+    from nexus.core import backup as backup_module
+
+    core.login("admin", PASSWORD)
+    monkeypatch.setattr(backup_module, "sha256_file", lambda p: (_ for _ in ()).throw(OSError("disco cheio")))
+    with pytest.raises(BackupError, match="Falha ao criar backup"):
+        core.backups.create("x")
+    assert core.backups.list() == []
