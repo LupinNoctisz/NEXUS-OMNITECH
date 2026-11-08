@@ -15,4 +15,6 @@ Cada etapa só começa após a anterior estar testada e documentada. Antes de ca
 | 9 | Segurança e testes (assinatura de módulos, revisão de TOCTOU, auditoria externa) | ⏳ |
 | 10 | Preparação comercial | ⏳ |
 
+**Nota de numeração:** as "Fases" do projeto (1 app desktop, 2 estabilidade, **3 biblioteca técnica**, 4 ferramentas, 5 diagnóstico inteligente, 6 instrumentos, 7 expansão, 8 ecossistema LMF) são mais recentes que a tabela acima; a Fase 3 está em projeto: ver [LIBRARY-DESIGN.md](LIBRARY-DESIGN.md). A tabela será alinhada na entrega 3.8.
+
 Integração com o LMF Control: prevista como camada independente (importar equipamentos/OS, exportar laudos), sem acoplar os sistemas.
