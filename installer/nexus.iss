@@ -4,7 +4,7 @@
 ; por instalação/atualização; a desinstalação só os remove se o usuário confirmar explicitamente.
 
 #ifndef AppVersion
-  #define AppVersion "0.1.2"
+  #define AppVersion "0.1.3"
 #endif
 #ifndef StageDir
   #define StageDir "..\build\stage"

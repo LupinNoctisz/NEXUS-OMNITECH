@@ -9,7 +9,7 @@
     <RootNamespace>Nexus.App</RootNamespace>
     <AssemblyName>NexusOmnitech</AssemblyName>
     <ApplicationTitle>NEXUS OMNITECH</ApplicationTitle>
-    <Version>0.1.2</Version>
+    <Version>0.1.3</Version>
     <Company>LMF Informática</Company>
     <Product>NEXUS OMNITECH</Product>
     <ApplicationIcon>Assets\nexus.ico</ApplicationIcon>
