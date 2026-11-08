@@ -2,13 +2,13 @@
 .SYNOPSIS
   Gera o instalador do NEXUS OMNITECH (publicação .NET + núcleo Python + Inno Setup).
 .EXAMPLE
-  ./installer/build.ps1 -Version 0.1.1
+  ./installer/build.ps1 -Version 0.1.2
 .NOTES
   Requer: .NET 8 SDK e Inno Setup 6 (ISCC.exe). Saída: build\installer\NexusOmnitech-Setup-<versão>.exe (+ .sha256).
   -SkipPublish reaproveita build\stage (usado nos testes de atualização, só para mudar o número da versão do instalador).
 #>
 param(
-    [string]$Version = "0.1.1",
+    [string]$Version = "0.1.2",
     [switch]$SkipPublish
 )
 $ErrorActionPreference = "Stop"
