@@ -30,6 +30,12 @@ public sealed record OperationDto(long Id, string Ts, string Technician, string 
 public sealed record ModuleStatusDto(string Id, string Name, string Version, string Publisher, string Status,
     bool Registered, bool Enabled, bool Loaded, bool? IntegrityOk, List<string> Problems);
 
+// Aba Manutenção: módulos que declaram `maintenance_category` no manifesto, agrupados por categoria.
+public sealed record MaintenanceModuleDto(string Id, string Name, string Version, string Publisher, string Status,
+    bool Registered, bool Enabled, bool Loaded, bool? IntegrityOk, List<string> Problems, string Description);
+
+public sealed record MaintenanceCategoryDto(string Key, string Label, List<MaintenanceModuleDto> Modules);
+
 public sealed record BackupDto(string Name, long SizeBytes, string ModifiedUtc, bool HasChecksum);
 
 public sealed record BackupSummary(int Count, string? Latest, string? LatestUtc);

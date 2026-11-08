@@ -23,6 +23,7 @@
 
 ## Módulos
 Cada módulo é uma pasta com `manifest.json` (id, versão, publicador, `entry`, `min_core`, `files` com SHA-256).
+Para aparecer na aba **Manutenção**, o manifesto declara `"maintenance_category": "celular" | "computador" | "console" | "notebook"` (opcional; sem ele o módulo só aparece em Módulos). A aba apenas lista os módulos por categoria; ela não tem conteúdo próprio.
 Estados: `planned` (apenas declarado) e `available`. Fluxo: `seal` (desenvolvedor) → `register --confirm` (admin) →
 `enable` → carregamento no início do núcleo, **com nova verificação de integridade a cada carga**.
 Módulos podem ser instalados, atualizados, ativados e desativados de forma independente.

@@ -97,6 +97,9 @@ public sealed class CoreApi : ICoreApi
     public Task<List<ModuleStatusDto>> ListModulesAsync(CancellationToken ct = default)
         => _rpc.InvokeAsync<List<ModuleStatusDto>>("modules.list", null, ct);
 
+    public Task<List<MaintenanceCategoryDto>> ListMaintenanceAsync(CancellationToken ct = default)
+        => _rpc.InvokeAsync<List<MaintenanceCategoryDto>>("maintenance.list", null, ct);
+
     public Task<ModuleVerify> VerifyModuleAsync(string id, CancellationToken ct = default)
         => _rpc.InvokeAsync<ModuleVerify>("modules.verify", P(("id", id)), ct);
 

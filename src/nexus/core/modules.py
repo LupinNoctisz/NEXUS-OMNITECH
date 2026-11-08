@@ -32,6 +32,8 @@ _VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 _ENTRY = re.compile(r"^[\w./-]+\.py:[A-Za-z_]\w*$")
 _EXECUTABLE_SUFFIXES = {".py", ".pyd", ".dll", ".exe", ".ps1", ".bat", ".cmd", ".so", ".dylib", ".sh", ".msi"}
 STATUSES = ("planned", "available")
+# Categorias da aba "Manutenção" (módulo declara uma no manifesto: "maintenance_category").
+MAINTENANCE_CATEGORIES = {"celular": "Celular", "computador": "Computador", "console": "Console", "notebook": "Notebook"}
 
 
 def parse_version(text: str) -> tuple[int, int, int]:
@@ -55,6 +57,7 @@ class Manifest:
     description: str
     root: Path
     manifest_sha256: str
+    maintenance_category: str | None = None
 
     @classmethod
     def from_dir(cls, root: Path) -> "Manifest":
@@ -86,6 +89,9 @@ class Manifest:
             raise ModuleError("'files' deve mapear caminho -> sha256.")
         if data["status"] == "available" and entry.split(":")[0] not in files:
             raise ModuleError("O arquivo 'entry' precisa constar em 'files' (com SHA-256) para ser verificado antes de carregar.")
+        category = data.get("maintenance_category")
+        if category is not None and category not in MAINTENANCE_CATEGORIES:
+            raise ModuleError(f"maintenance_category inválida: {category!r} (use {', '.join(MAINTENANCE_CATEGORIES)}).")
         min_core = data.get("min_core", "0.1.0")
         parse_version(min_core)
         signable = {k: v for k, v in data.items() if k != "signature"}
@@ -95,6 +101,7 @@ class Manifest:
             permissions=tuple(data.get("permissions", [])), files=dict(files),
             description=str(data.get("description", "")), root=root,
             manifest_sha256=sha256_bytes(canonical_json(signable).encode("utf-8")),
+            maintenance_category=category,
         )
 
 
@@ -337,6 +344,17 @@ class ModuleRegistry:
             self.unload(module_id)
 
     # -- consulta ----------------------------------------------------------
+    def maintenance(self) -> list[dict[str, Any]]:
+        """Módulos de manutenção agrupados por categoria (as quatro categorias sempre aparecem)."""
+        manifests = self.discover()
+        by_category: dict[str, list[dict[str, Any]]] = {key: [] for key in MAINTENANCE_CATEGORIES}
+        for row in self.status():
+            category = manifests[row["id"]].maintenance_category
+            if category in by_category:
+                by_category[category].append({**row, "description": manifests[row["id"]].description})
+        return [{"key": key, "label": label, "modules": by_category[key]}
+                for key, label in MAINTENANCE_CATEGORIES.items()]
+
     def status(self) -> list[dict[str, Any]]:
         result = []
         for module_id, manifest in sorted(self.discover().items()):

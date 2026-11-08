@@ -565,11 +565,38 @@ public class SecuritySettingsLoginShellTests
     }
 
     [Fact]
+    public async Task Maintenance_lists_the_four_categories_empty_without_inventing_modules()
+    {
+        var api = new FakeCoreApi();
+        var vm = new MaintenanceViewModel(api, Make.Viewer(), new FakeDialogs());
+
+        await vm.LoadAsync();
+
+        Assert.Equal(new[] { "Celular", "Computador", "Console", "Notebook" }, vm.Categories.Select(c => c.Label).ToArray());
+        Assert.All(vm.Categories, c => Assert.True(c.IsEmpty));
+        Assert.Equal(1, api.CallCount("maintenance.list"));
+    }
+
+    [Fact]
+    public void Maintenance_module_row_explains_its_state()
+    {
+        MaintenanceModuleRow Row(string status, bool registered, bool enabled, bool loaded, bool? integrity) =>
+            new(new MaintenanceModuleDto("nexus.x", "X", "1.0.0", "LMF", status, registered, enabled, loaded, integrity,
+                new List<string>(), ""));
+
+        Assert.Equal("Planejado (não implementado)", Row("planned", false, false, false, null).StateText);
+        Assert.Contains("FALHOU", Row("available", true, true, false, false).StateText);
+        Assert.Equal("Ativo", Row("available", true, true, true, true).StateText);
+        Assert.Contains("desativado", Row("available", true, false, false, true).StateText);
+        Assert.Contains("Não registrado", Row("available", false, false, false, true).StateText);
+    }
+
+    [Fact]
     public void Shell_exposes_the_sections_in_order_for_admin()
     {
         var shell = new ShellViewModel(new FakeCoreApi(), Make.Admin(), new FakeDialogs(), new FakeTheme(), new FakeRuntime());
         Assert.Equal(
-            new[] { "Início", "Dispositivos", "Diagnósticos", "Histórico", "Módulos", "Backups", "Segurança", "Configurações", "Minha conta" },
+            new[] { "Início", "Dispositivos", "Diagnósticos", "Histórico", "Módulos", "Manutenção", "Backups", "Segurança", "Configurações", "Minha conta" },
             shell.Items.Select(i => i.Title).ToArray());
     }
 

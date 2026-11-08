@@ -331,3 +331,10 @@ def test_identify_rpc_returns_suggestion_without_writing(logged, core):
     assert result["vendor"] == "HP" and result["serial"] == "5CD1234XYZ"
     assert len(core.devices.list()) == before
     assert logged.err("devices.identify", text="x" * 2001)["code"] == proto.INVALID_PARAMS
+
+
+def test_maintenance_list_rpc_needs_login_and_returns_categories(rpc):
+    assert rpc.err("maintenance.list")["code"] == proto.NOT_AUTHENTICATED
+    rpc.ok("auth.login", name="admin", password=PASSWORD)
+    keys = [c["key"] for c in rpc.ok("maintenance.list")]
+    assert keys == ["celular", "computador", "console", "notebook"]

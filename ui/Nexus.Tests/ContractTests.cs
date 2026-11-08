@@ -115,6 +115,9 @@ public class ContractTests
         Assert.Equal("ABC1234", identified.Serial);
         Assert.Equal("texto restante", identified.Sources["model"]);
 
+        var maintenance = Fixture.Result<List<MaintenanceCategoryDto>>("maintenance_list");
+        Assert.Equal(new[] { "celular", "computador", "console", "notebook" }, maintenance.Select(c => c.Key).ToArray());
+
         var restore = Fixture.Result<RestoreResult>("restore_result");
         Assert.True(restore.SessionActive);
         Assert.EndsWith(".db", restore.SafetyBackup);

@@ -1,0 +1,26 @@
+{
+  "jsonrpc": "2.0",
+  "id": 17,
+  "result": [
+    {
+      "key": "celular",
+      "label": "Celular",
+      "modules": []
+    },
+    {
+      "key": "computador",
+      "label": "Computador",
+      "modules": []
+    },
+    {
+      "key": "console",
+      "label": "Console",
+      "modules": []
+    },
+    {
+      "key": "notebook",
+      "label": "Notebook",
+      "modules": []
+    }
+  ]
+}

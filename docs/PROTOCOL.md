@@ -56,6 +56,7 @@ A interface (WPF) inicia o núcleo como **processo filho**: `python -m nexus --h
 | `audit.list` | sim | `limit?`, `session_id?` | lista |
 | `audit.verify` | sim | – | `{ok, records, first_bad_id, scope}` (`scope`: `full`; a conferência completa percorre a cadeia em lotes) |
 | `modules.list` | sim | – | estado real de cada módulo |
+| `maintenance.list` | sim | – | `[{key, label, modules[]}]` — módulos com `maintenance_category` (`celular`, `computador`, `console`, `notebook`) no manifesto; as 4 categorias sempre voltam, mesmo vazias |
 | `modules.verify` | sim | `id` | `{ok, problems}` |
 | `modules.register` | sim | `id`, `confirmed` | `{ok}` |
 | `modules.enable` / `modules.disable` | sim | `id` | `{ok}` |

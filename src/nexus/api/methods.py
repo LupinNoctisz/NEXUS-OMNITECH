@@ -107,6 +107,8 @@ def build_registry(shutdown: Callable[[], None]) -> dict[str, Method]:
 
     # --- módulos -------------------------------------------------------------------------------------
     add("modules.list", lambda c, p: c.modules.status())
+    add("maintenance.list", lambda c, p: c.modules.maintenance(),
+        description="Módulos de manutenção por categoria (celular, computador, console, notebook).")
     add("modules.verify", lambda c, p: _module_verify(c, p["id"]), {"id": Param("str", max_len=100)})
     add("modules.register", lambda c, p: (c.modules.register(p["id"], confirmed=p["confirmed"]), {"ok": True})[1],
         {"id": Param("str", max_len=100), "confirmed": Param("bool", False, default=False)})

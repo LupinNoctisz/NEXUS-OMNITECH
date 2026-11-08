@@ -35,6 +35,7 @@ public interface ICoreApi
     Task<AuditVerify> VerifyAuditAsync(CancellationToken ct = default);
 
     Task<List<ModuleStatusDto>> ListModulesAsync(CancellationToken ct = default);
+    Task<List<MaintenanceCategoryDto>> ListMaintenanceAsync(CancellationToken ct = default);
     Task<ModuleVerify> VerifyModuleAsync(string id, CancellationToken ct = default);
     Task RegisterModuleAsync(string id, bool confirmed, CancellationToken ct = default);
     Task EnableModuleAsync(string id, CancellationToken ct = default);

@@ -24,6 +24,7 @@ public sealed partial class ShellViewModel : ObservableObject
             new("diagnostics", "Diagnósticos", "", () => new DiagnosticsViewModel(api, session, dialogs)),
             new("history", "Histórico", "", () => new HistoryViewModel(api, session, dialogs)),
             new("modules", "Módulos", "", () => new ModulesViewModel(api, session, dialogs)),
+            new("maintenance", "Manutenção", "\uE90F", () => new MaintenanceViewModel(api, session, dialogs)),
             new("backups", "Backups", "", () => new BackupsViewModel(api, session, dialogs)),
             new("security", "Segurança", "", () => new SecurityViewModel(api, session, dialogs), "security.read"),
             new("settings", "Configurações", "", () => new SettingsViewModel(api, session, dialogs, theme, runtime), "settings.read"),

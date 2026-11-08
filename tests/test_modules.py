@@ -149,3 +149,41 @@ def test_module_facade_respects_permissions(core, make_module, login_as):
     login_as("leitor", "viewer")
     with pytest.raises(PermissionDenied):
         ctx.sessions.start(1)
+
+
+# --- aba Manutenção --------------------------------------------------------------------
+def _tag(root, category):
+    import json as _json
+    from nexus.core.modules import seal_manifest as _seal
+    path = root / "manifest.json"
+    data = _json.loads(path.read_text(encoding="utf-8"))
+    data["maintenance_category"] = category
+    path.write_text(_json.dumps(data), encoding="utf-8")
+    _seal(root)
+
+
+def test_maintenance_always_lists_the_four_categories_empty(core):
+    result = core.modules.maintenance()
+    assert [c["key"] for c in result] == ["celular", "computador", "console", "notebook"]
+    assert all(c["modules"] == [] for c in result)
+
+
+def test_maintenance_groups_tagged_modules_only(core, make_module):
+    _tag(make_module("reparo_a"), "celular")
+    _tag(make_module("reparo_b"), "notebook")
+    make_module("geral")  # sem categoria: não entra na aba Manutenção
+    result = {c["key"]: [m["id"] for m in c["modules"]] for c in core.modules.maintenance()}
+    assert result == {"celular": ["nexus.reparo_a"], "computador": [], "console": [], "notebook": ["nexus.reparo_b"]}
+
+
+def test_maintenance_category_is_validated(core, make_module):
+    import pytest as _pytest
+    from nexus.core import ModuleError
+    root = make_module("ruim")
+    import json as _json
+    data = _json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    data["maintenance_category"] = "geladeira"
+    (root / "manifest.json").write_text(_json.dumps(data), encoding="utf-8")
+    from nexus.core.modules import Manifest
+    with _pytest.raises(ModuleError):
+        Manifest.from_dir(root)

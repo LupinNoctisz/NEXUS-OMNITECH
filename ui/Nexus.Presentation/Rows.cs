@@ -132,3 +132,42 @@ public sealed class TechnicianRow
     public string PasswordText => Technician.HasPassword ? "Definida" : "SEM SENHA";
     public string LockText => string.IsNullOrEmpty(Technician.LockedUntil) ? "" : "Bloqueado até " + TimeText.Local(Technician.LockedUntil);
 }
+
+public sealed class MaintenanceModuleRow
+{
+    public MaintenanceModuleRow(MaintenanceModuleDto module) { Module = module; }
+
+    public MaintenanceModuleDto Module { get; }
+    public string Name => Module.Name;
+    public string Version => Module.Version;
+    public string Publisher => Module.Publisher;
+    public string Description => Module.Description;
+    public bool HasDescription => !string.IsNullOrWhiteSpace(Module.Description);
+
+    public string StateText
+    {
+        get
+        {
+            if (Module.Status != "available") return Labels.ModuleStatus(Module.Status);
+            if (Module.IntegrityOk == false) return "Integridade FALHOU — não será carregado";
+            if (Module.Enabled) return Module.Loaded ? "Ativo" : "Ativado (reinicie para carregar)";
+            return Module.Registered ? "Registrado (desativado)" : "Não registrado (registre em Módulos)";
+        }
+    }
+}
+
+public sealed class MaintenanceCategoryRow
+{
+    public MaintenanceCategoryRow(MaintenanceCategoryDto category)
+    {
+        Key = category.Key;
+        Label = category.Label;
+        foreach (var module in category.Modules) Modules.Add(new MaintenanceModuleRow(module));
+    }
+
+    public string Key { get; }
+    public string Label { get; }
+    public List<MaintenanceModuleRow> Modules { get; } = new();
+    public bool IsEmpty => Modules.Count == 0;
+    public string CountText => Modules.Count == 1 ? "1 módulo" : $"{Modules.Count} módulos";
+}

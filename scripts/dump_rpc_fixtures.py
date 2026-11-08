@@ -90,6 +90,7 @@ def main() -> None:
         call("audit_list", "audit.list", limit=5)
         call("audit_verify", "audit.verify")
         call("modules_list", "modules.list")
+        call("maintenance_list", "maintenance.list")
         call("module_verify", "modules.verify", id="nexus.demo")
         call("backups_list", "backups.list")
         call("settings_all", "settings.get_all")

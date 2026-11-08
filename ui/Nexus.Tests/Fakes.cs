@@ -149,6 +149,14 @@ public sealed class FakeCoreApi : ICoreApi
 
     public Task<AuditVerify> VerifyAuditAsync(CancellationToken ct = default) { Record("audit.verify"); return Task.FromResult(AuditResult); }
 
+    public List<MaintenanceCategoryDto> Maintenance = Fixture.Result<List<MaintenanceCategoryDto>>("maintenance_list");
+
+    public Task<List<MaintenanceCategoryDto>> ListMaintenanceAsync(CancellationToken ct = default)
+    {
+        Record("maintenance.list");
+        return Task.FromResult(Maintenance);
+    }
+
     public Task<List<ModuleStatusDto>> ListModulesAsync(CancellationToken ct = default)
     {
         Record("modules.list");
